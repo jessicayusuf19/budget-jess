@@ -412,33 +412,39 @@ textarea{resize:vertical;min-height:100px;line-height:1.5}
 <div class="content" id="tab-saving">
   <div class="cgrid">
     <div>
-      <div class="acard bca1" onclick="openAccDetail('bca1')" style="cursor:pointer">
-        <div class="aclbl">REKENING 1 — HARIAN · <span style="opacity:.7;font-size:.65rem">tap untuk riwayat</span></div>
+      <div class="acard bca1" id="s1-card" onclick="openAccDetail('bca1')" style="cursor:pointer">
+        <div class="aclbl" style="display:flex;justify-content:space-between;align-items:center">
+          <span><span id="s1-ico">🏦</span> REKENING 1 · <span style="opacity:.7;font-size:.65rem">tap untuk riwayat</span></span>
+          <button onclick="event.stopPropagation();openAccEdit('bca1')" style="background:rgba(255,255,255,.2);border:none;color:#fff;border-radius:6px;padding:2px 7px;font-size:.7rem;cursor:pointer">✏️ Edit</button>
+        </div>
         <div class="acname" id="s1n">BCA Operasional</div>
         <div class="acbal" id="s1b">Rp 0</div>
-        <div class="acsub">Rekening pribadi sehari-hari</div>
         <div class="acbtns" onclick="event.stopPropagation()">
           <button onclick="openSM('bca1','masuk')">+ Masuk</button>
           <button onclick="openSM('bca1','keluar')">− Keluar</button>
           <button onclick="openSM('bca1','set')">✏️ Set</button>
         </div>
       </div>
-      <div class="acard bca2" onclick="openAccDetail('bca2')" style="cursor:pointer">
-        <div class="aclbl">REKENING 2 — TABUNGAN · <span style="opacity:.7;font-size:.65rem">tap untuk riwayat</span></div>
+      <div class="acard bca2" id="s2-card" onclick="openAccDetail('bca2')" style="cursor:pointer">
+        <div class="aclbl" style="display:flex;justify-content:space-between;align-items:center">
+          <span><span id="s2-ico">💚</span> REKENING 2 · <span style="opacity:.7;font-size:.65rem">tap untuk riwayat</span></span>
+          <button onclick="event.stopPropagation();openAccEdit('bca2')" style="background:rgba(255,255,255,.2);border:none;color:#fff;border-radius:6px;padding:2px 7px;font-size:.7rem;cursor:pointer">✏️ Edit</button>
+        </div>
         <div class="acname" id="s2n">BCA Tabungan</div>
         <div class="acbal" id="s2b">Rp 0</div>
-        <div class="acsub">Tidak disentuh — terus tumbuh 🌱</div>
         <div class="acbtns" onclick="event.stopPropagation()">
           <button onclick="openSM('bca2','masuk')">+ Masuk</button>
           <button onclick="openSM('bca2','keluar')">− Keluar</button>
           <button onclick="openSM('bca2','set')">✏️ Set</button>
         </div>
       </div>
-      <div class="acard bri" onclick="openAccDetail('bri')" style="cursor:pointer">
-        <div class="aclbl">REKENING 3 — RUMAH TANGGA · <span style="opacity:.7;font-size:.65rem">tap untuk riwayat</span></div>
+      <div class="acard bri" id="s3-card" onclick="openAccDetail('bri')" style="cursor:pointer">
+        <div class="aclbl" style="display:flex;justify-content:space-between;align-items:center">
+          <span><span id="s3-ico">🏠</span> REKENING 3 · <span style="opacity:.7;font-size:.65rem">tap untuk riwayat</span></span>
+          <button onclick="event.stopPropagation();openAccEdit('bri')" style="background:rgba(255,255,255,.2);border:none;color:#fff;border-radius:6px;padding:2px 7px;font-size:.7rem;cursor:pointer">✏️ Edit</button>
+        </div>
         <div class="acname" id="s3n">BRI</div>
         <div class="acbal" id="s3b">Rp 0</div>
-        <div class="acsub">Untuk kebutuhan rumah tangga</div>
         <div class="acbtns" onclick="event.stopPropagation()">
           <button onclick="openSM('bri','masuk')">+ Masuk</button>
           <button onclick="openSM('bri','keluar')">− Keluar</button>
