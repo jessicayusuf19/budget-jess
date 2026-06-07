@@ -1134,57 +1134,50 @@ function save(){
   if(fbConnected&&fbRef){setSyncStatus('syncing');fbRef.set(st).then(()=>setSyncStatus('connected')).catch(e=>{setSyncStatus('error');console.error(e)})}
 }
 let st=load();
-// ── MIGRATION: retroactive balance deduction for old transactions ──
-(function migrateDeductions(){
-  let changed=false;
-  function applyDed(tx){
+
+function runMigrations(){
+  // ── 1: retroactive balance deduction for old transactions ──
+  st.pTx.forEach(tx=>{
     if(tx._ded)return;
     const pay=tx.pay||'';
-    let acc=null;
-    if(pay==='Transfer BCA'||pay==='Cash')acc='bca1';
-    else if(pay==='Transfer BRI'||pay==='BRI')acc='bri';
-    if(acc&&tx.type==='expense'){
-      // Allow negative
-      st.acc[acc].balance=(st.acc[acc].balance||0)-tx.amt;
-      tx._ded=true;changed=true;
-    } else {
-      tx._ded=true;changed=true; // mark as processed even if no deduction
-    }
-  }
-  st.pTx.forEach(applyDed);
-  st.rtTx.forEach(applyDed);
-  if(changed)localStorage.setItem('jb_v5',JSON.stringify(st));
-})();
-
-// ── MIGRATION: sync already-paid reminders → transactions ──
-(function migrateRemPaid(){
-  if(!st.reminderPaid)return;
-  let changed=false;
-  function _ded(pay,amt){
-    if(pay==='Transfer BCA'||pay==='Cash')st.acc.bca1.balance=(st.acc.bca1.balance||0)-amt;
-    else if(pay==='Transfer BRI'||pay==='BRI')st.acc.bri.balance=(st.acc.bri.balance||0)-amt;
-  }
-  Object.keys(st.reminderPaid).forEach(m=>{
-    const paid=st.reminderPaid[m];
-    Object.keys(paid||{}).forEach(id=>{
-      if(!paid[id])return;
-      const rem=(st.reminders||[]).find(r=>r.id===id);
-      if(!rem||!rem.amt||rem.amt<=0||!rem.type||rem.type==='tabungan')return;
-      const txId='rem_'+id+'_'+m;
-      const inP=st.pTx.find(t=>t.id===txId);
-      const inRT=st.rtTx.find(t=>t.id===txId);
-      if(inP||inRT)return; // already exists
-      const txDate=m+'-'+String(rem.day||1).padStart(2,'0');
-      const tx={id:txId,date:txDate,desc:rem.name,amt:rem.amt,type:'expense',cat:rem.cat||rem.name,pay:rem.pay||'',_ded:true};
-      if(rem.type==='rt'){st.rtTx.push(tx);_ded(tx.pay,tx.amt);}
-      else{st.pTx.push(tx);_ded(tx.pay,tx.amt);}
-      changed=true;
-    });
+    if((pay==='Transfer BCA'||pay==='Cash')&&tx.type==='expense')
+      st.acc.bca1.balance=(st.acc.bca1.balance||0)-tx.amt;
+    else if((pay==='Transfer BRI'||pay==='BRI')&&tx.type==='expense')
+      st.acc.bri.balance=(st.acc.bri.balance||0)-tx.amt;
+    tx._ded=true;
   });
-  if(changed)localStorage.setItem('jb_v5',JSON.stringify(st));
-})();
+  st.rtTx.forEach(tx=>{
+    if(tx._ded)return;
+    const pay=tx.pay||'';
+    if((pay==='Transfer BCA'||pay==='Cash')&&tx.type==='expense')
+      st.acc.bca1.balance=(st.acc.bca1.balance||0)-tx.amt;
+    else if((pay==='Transfer BRI'||pay==='BRI')&&tx.type==='expense')
+      st.acc.bri.balance=(st.acc.bri.balance||0)-tx.amt;
+    tx._ded=true;
+  });
+  // ── 2: sync already-paid reminders → transactions ──
+  if(st.reminderPaid){
+    Object.keys(st.reminderPaid).forEach(m=>{
+      const paid=st.reminderPaid[m];
+      Object.keys(paid||{}).forEach(id=>{
+        if(!paid[id])return;
+        const rem=(st.reminders||[]).find(r=>r.id===id);
+        if(!rem||!rem.amt||rem.amt<=0||!rem.type||rem.type==='tabungan')return;
+        const txId='rem_'+id+'_'+m;
+        if(st.pTx.find(t=>t.id===txId)||st.rtTx.find(t=>t.id===txId))return;
+        const txDate=m+'-'+String(rem.day||1).padStart(2,'0');
+        const tx={id:txId,date:txDate,desc:rem.name,amt:rem.amt,type:'expense',cat:rem.cat||rem.name,pay:rem.pay||'',_ded:true};
+        const pay=tx.pay;
+        if(rem.type==='rt'){st.rtTx.push(tx);}
+        else{st.pTx.push(tx);}
+        if((pay==='Transfer BCA'||pay==='Cash')&&tx.amt)st.acc.bca1.balance=(st.acc.bca1.balance||0)-tx.amt;
+        else if((pay==='Transfer BRI'||pay==='BRI')&&tx.amt)st.acc.bri.balance=(st.acc.bri.balance||0)-tx.amt;
+      });
+    });
+  }
+}
 
-// Persist migrated data
+runMigrations();
 save();
 
 // ══════════════════════════
