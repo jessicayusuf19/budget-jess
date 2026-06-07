@@ -1185,6 +1185,24 @@ function rOV(){
 }
 
 // ══════════════════════════
+// PAY → ACCOUNT MAPPING
+// ══════════════════════════
+function payToAcc(pay){
+  if(!pay)return null;
+  if(pay==='Transfer BCA'||pay==='CC BCA')return'bca1';
+  if(pay==='Transfer BRI'||pay==='BRI')return'bri';
+  return null; // Cash, CC CIMB, CC UOB tidak auto-deduct
+}
+function deductAcc(pay,amt){
+  const acc=payToAcc(pay);
+  if(acc)st.acc[acc].balance=Math.max(0,(st.acc[acc].balance||0)-amt);
+}
+function reverseAcc(pay,amt){
+  const acc=payToAcc(pay);
+  if(acc)st.acc[acc].balance=(st.acc[acc].balance||0)+amt;
+}
+
+// ══════════════════════════
 // PRIBADI
 // ══════════════════════════
 let pM=nowM(),pType='expense';
