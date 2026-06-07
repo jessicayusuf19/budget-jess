@@ -1322,12 +1322,26 @@ function payToAcc(pay){
 }
 function deductAcc(pay,amt,tx){
   const acc=payToAcc(pay);
-  if(acc)st.acc[acc].balance=(st.acc[acc].balance||0)-amt; // allow negative
-  if(tx)tx._ded=true;
+  if(!acc)return;
+  st.acc[acc].balance=(st.acc[acc].balance||0)-amt;
+  if(tx){
+    tx._ded=true;
+    // Add to account history so it shows in riwayat rekening
+    const histId='ded_'+tx.id;
+    if(!st.savH.find(h=>h.id===histId)){
+      st.savH.unshift({id:histId,date:tx.date||today(),desc:tx.desc||'Pengeluaran',amt,acc,type:'keluar',fromTx:true});
+    }
+  }
 }
-function reverseAcc(pay,amt){
+function reverseAcc(pay,amt,tx){
   const acc=payToAcc(pay);
-  if(acc)st.acc[acc].balance=(st.acc[acc].balance||0)+amt;
+  if(!acc)return;
+  st.acc[acc].balance=(st.acc[acc].balance||0)+amt;
+  // Remove the linked history entry if exists
+  if(tx){
+    const histId='ded_'+tx.id;
+    st.savH=st.savH.filter(h=>h.id!==histId);
+  }
 }
 
 // ══════════════════════════
