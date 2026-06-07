@@ -11,8 +11,13 @@
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
 <style>
+/* ── DARK MODE VARIABLES ── */
+:root{--bg:#f0f2f8;--card:#fff;--text:#1a1a2e;--border:#e8e8f0;--sub:#999;--thead:#f7f7fc;--rowborder:#f0f0f8;--input-bg:#fff;--tab-bg:#fff;--empty:#bbb}
+[data-theme=dark]{--bg:#0f0f1a;--card:#1c1c2e;--text:#e4e4f0;--border:#2e2e45;--sub:#777;--thead:#141428;--rowborder:#232336;--input-bg:#242438;--tab-bg:#1c1c2e;--empty:#555}
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Segoe UI',-apple-system,sans-serif;background:#f0f2f8;color:#1a1a2e;min-height:100vh}
+body{font-family:'Segoe UI',-apple-system,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;transition:background .2s,color .2s}
+/* mobile bottom nav spacing */
+@media(max-width:640px){body{padding-bottom:64px}}
 
 /* ── HEADER ── */
 .main-hdr{background:linear-gradient(135deg,#6c63ff 0%,#3f3d8a 100%);color:#fff;padding:22px 24px 18px}
