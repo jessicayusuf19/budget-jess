@@ -146,26 +146,45 @@ tr:last-child td{border-bottom:none}
 .acbtns button:active{opacity:.72}
 
 /* ── MODAL ── */
-.mover{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;display:none;align-items:flex-end;justify-content:center}
+.mover{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:200;display:none;align-items:flex-end;justify-content:center}
 .mover.open{display:flex}
-.modal{background:#fff;width:100%;max-width:480px;border-radius:22px 22px 0 0;padding:22px 18px 38px;max-height:85vh;overflow-y:auto}
-.modal h3{font-size:.97rem;font-weight:800;margin-bottom:16px}
+.modal{background:var(--card);width:100%;max-width:480px;border-radius:22px 22px 0 0;padding:22px 18px 38px;max-height:85vh;overflow-y:auto}
+.modal h3{font-size:.97rem;font-weight:800;margin-bottom:16px;color:var(--text)}
 
 /* ── TOAST ── */
-#toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:#1a1a2e;color:#fff;padding:9px 20px;border-radius:20px;font-size:.82rem;font-weight:700;z-index:300;opacity:0;transition:opacity .25s;white-space:nowrap;pointer-events:none}
+#toast{position:fixed;bottom:74px;left:50%;transform:translateX(-50%);background:#1a1a2e;color:#fff;padding:9px 20px;border-radius:20px;font-size:.82rem;font-weight:700;z-index:400;opacity:0;transition:opacity .25s;white-space:nowrap;pointer-events:none}
 #toast.show{opacity:1}
+@media(min-width:641px){#toast{bottom:22px}}
 
 /* ── EMPTY ── */
-.empty{text-align:center;padding:26px 16px;color:#bbb}
+.empty{text-align:center;padding:26px 16px;color:var(--empty)}
 .empty .ei{font-size:2rem;margin-bottom:8px}
 .empty p{font-size:.82rem;line-height:1.55}
 
 /* ── SETTINGS ── */
-.strow{display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-bottom:1px solid #f0f0f8}
+.strow{display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--rowborder)}
 .strow:last-child{border-bottom:none}
-.strow label{font-size:.86rem;font-weight:600}
-.strow input{padding:8px 11px;border:2px solid #e8e8f0;border-radius:10px;font-size:.86rem;width:155px;outline:none}
+.strow label{font-size:.86rem;font-weight:600;color:var(--text)}
+.strow input{padding:8px 11px;border:2px solid var(--border);border-radius:10px;font-size:.86rem;width:155px;outline:none;background:var(--input-bg);color:var(--text)}
 .strow input:focus{border-color:#6c63ff}
+
+/* ── DARK TOGGLE BTN ── */
+.dark-btn{background:rgba(255,255,255,.18);border:none;border-radius:20px;padding:5px 13px;font-size:.78rem;font-weight:700;color:#fff;cursor:pointer;transition:background .15s}
+.dark-btn:hover{background:rgba(255,255,255,.28)}
+
+/* ── EXPORT BUTTONS ── */
+.export-row{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+.export-btn{padding:9px 16px;border-radius:11px;border:2px solid var(--border);background:var(--card);color:var(--text);font-size:.8rem;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px;transition:all .15s}
+.export-btn:hover{border-color:#6c63ff;color:#6c63ff}
+
+/* ── PRINT ── */
+@media print{
+  .tabs,.mob-nav,.export-row,.main-hdr .hdr-badges,.dbtn,button{display:none!important}
+  body{background:#fff!important;color:#000!important;padding:0!important}
+  .card{box-shadow:none!important;border:1px solid #ddd!important;page-break-inside:avoid}
+  .content{display:block!important;padding:10px!important}
+  canvas{max-height:300px!important}
+}
 
 /* ── SYNC STATUS ── */
 .sync-dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px;flex-shrink:0}
