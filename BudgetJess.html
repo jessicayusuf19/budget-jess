@@ -1379,7 +1379,8 @@ function savePTx(){
     const n=parseInt(document.getElementById('p-cicilan-n').value)||3;
     const base={id:Date.now().toString(),date,desc,amt,type:'expense',cat:document.getElementById('p-cat').value,pay:document.getElementById('p-pay').value};
     addCicilanTx(st.pTx,base,n);
-    deductAcc(base.pay,base.amt);
+    deductAcc(base.pay,base.amt,base);
+    st.pTx.filter(t=>t.id.startsWith(base.id)).forEach(t=>t._ded=true);
     save();
     document.getElementById('p-desc').value='';document.getElementById('p-amt').value='';document.getElementById('p-date').value=today();
     document.getElementById('p-is-cicilan').checked=false;document.getElementById('p-cicilan-opts').style.display='none';
