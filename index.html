@@ -252,6 +252,17 @@ textarea{resize:vertical;min-height:100px;line-height:1.5}
   <div class="tab" onclick="go('sync')">☁️ Sync</div>
 </div>
 
+<!-- Mobile Bottom Nav -->
+<nav class="mob-nav" id="mob-nav">
+  <button class="mnb active" id="mn-overview" onclick="go('overview')"><span class="mni">📊</span>Overview</button>
+  <button class="mnb" id="mn-pribadi" onclick="go('pribadi')"><span class="mni">👤</span>Pribadi</button>
+  <button class="mnb" id="mn-rt" onclick="go('rt')"><span class="mni">🏡</span>RT</button>
+  <button class="mnb" id="mn-saving" onclick="go('saving')"><span class="mni">💰</span>Tabungan</button>
+  <button class="mnb" id="mn-laporan" onclick="go('laporan')"><span class="mni">📋</span>Laporan</button>
+  <button class="mnb" id="mn-settings" onclick="go('settings')"><span class="mni">⚙️</span>Seting</button>
+  <button class="mnb" id="mn-sync" onclick="go('sync')"><span class="mni">☁️</span>Sync</button>
+</nav>
+
 <!-- ════════ OVERVIEW ════════ -->
 <div class="content active" id="tab-overview">
   <div style="background:#f0f0ff;border-radius:12px;padding:11px 14px;margin-bottom:16px;font-size:.8rem;color:#555;line-height:1.6">
