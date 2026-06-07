@@ -1992,6 +1992,7 @@ function openRemMod(idx){
 }
 function closeRemMod(){document.getElementById('remmod').classList.remove('open');remIdx=-1}
 function saveRem(){
+  const icon=document.getElementById('rem-icon').value.trim();
   const name=document.getElementById('rem-name').value.trim();
   const day=parseInt(document.getElementById('rem-day').value);
   const amt=parseFloat(document.getElementById('rem-amt').value)||0;
