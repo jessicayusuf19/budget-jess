@@ -1516,11 +1516,11 @@ function confirmDel(){
   if(pS==='p'){
     const t=st.pTx.find(x=>x.id===pD);
     if(t?.type==='saving'&&t.dest)st.acc[t.dest].balance=Math.max(0,(st.acc[t.dest].balance||0)-t.amt);
-    if(t?.type==='expense')reverseAcc(t.pay,t.amt);
+    if(t?.type==='expense')reverseAcc(t.pay,t.amt,t);
     st.pTx=st.pTx.filter(x=>x.id!==pD);
   }else{
     const t=st.rtTx.find(x=>x.id===pD);
-    if(t)reverseAcc(t.pay,t.amt);
+    if(t)reverseAcc(t.pay,t.amt,t);
     st.rtTx=st.rtTx.filter(x=>x.id!==pD);
   }
   save();closeDM();if(pS==='p')rPD();else rRTD();rSavBals();showT('🗑 Dihapus');
