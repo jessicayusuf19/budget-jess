@@ -1446,6 +1446,51 @@ function confirmSM(){
 }
 
 // ══════════════════════════
+// ACCOUNT DETAIL MODAL
+// ══════════════════════════
+let currentAccDetail=null;
+function openAccDetail(acc){
+  currentAccDetail=acc;
+  const a=st.acc[acc];
+  document.getElementById('acc-mod-title').textContent='📋 '+a.name;
+  document.getElementById('acc-mod-bal').textContent=fmtF(a.balance||0);
+  const hist=[...st.savH].filter(h=>h.acc===acc).sort((a,b)=>b.date.localeCompare(a.date));
+  document.getElementById('acc-mod-hist').innerHTML=hist.length
+    ?hist.map(h=>`
+      <div class="txi">
+        <div class="txico" style="background:${h.type==='masuk'?'#dcfce7':'#fee2e2'}">${h.type==='masuk'?'📈':'📉'}</div>
+        <div class="txinfo">
+          <div class="txd">${h.desc}</div>
+          <div class="txm">${h.date}</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px">
+          <div class="txa${h.type==='masuk'?' pos':''}">${h.type==='masuk'?'+':'-'}${fmt(h.amt)}</div>
+          <button class="dbtn" onclick="delAccHist('${acc}','${h.date}','${h.desc}',${h.amt},'${h.type}')">🗑</button>
+        </div>
+      </div>`).join('')
+    :'<div class="empty"><div class="ei">📭</div><p>Belum ada riwayat transaksi</p></div>';
+  document.getElementById('accmod').classList.add('open');
+}
+function closeAccDetail(){document.getElementById('accmod').classList.remove('open');currentAccDetail=null}
+function openSMfromDetail(type){
+  closeAccDetail();
+  if(currentAccDetail||smSt.acc){
+    const acc=currentAccDetail||smSt.acc;
+    setTimeout(()=>openSM(acc,type),100);
+  }
+}
+function delAccHist(acc,date,desc,amt,type){
+  if(!confirm('Hapus riwayat ini?'))return;
+  // reverse balance
+  if(type==='masuk')st.acc[acc].balance=Math.max(0,(st.acc[acc].balance||0)-amt);
+  else st.acc[acc].balance=(st.acc[acc].balance||0)+amt;
+  // remove from savH
+  const idx=st.savH.findIndex(h=>h.acc===acc&&h.date===date&&h.desc===desc&&h.amt===amt&&h.type===type);
+  if(idx>=0)st.savH.splice(idx,1);
+  save();openAccDetail(acc);rSavBals();showT('🗑 Dihapus');
+}
+
+// ══════════════════════════
 // CC DETAIL MODAL
 // ══════════════════════════
 function openCCMod(payKey,label,billingDay){
