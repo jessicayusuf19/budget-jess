@@ -1979,6 +1979,7 @@ function openRemMod(idx){
   const isEdit=idx>=0&&idx<rems.length;
   document.getElementById('remmod-t').textContent=(isEdit?'✏️ Edit':'➕ Tambah')+' Pembayaran Rutin';
   const r=isEdit?rems[idx]:{};
+  document.getElementById('rem-icon').value=r.icon||'';
   document.getElementById('rem-name').value=r.name||'';
   document.getElementById('rem-day').value=r.day||'';
   document.getElementById('rem-amt').value=r.amt||'';
