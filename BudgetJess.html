@@ -1990,11 +1990,12 @@ function saveRem(){
   const day=parseInt(document.getElementById('rem-day').value);
   const amt=parseFloat(document.getElementById('rem-amt').value)||0;
   const note=document.getElementById('rem-note').value.trim();
+  const pay=document.getElementById('rem-pay').value;
   const type=document.getElementById('rem-type').value;
   const cat=document.getElementById('rem-cat').value;
   if(!name||!day||day<1||day>31){showT('❌ Isi nama dan tanggal!');return}
   if(!st.reminders)st.reminders=[];
-  const obj={name,day,amt,note,type,cat};
+  const obj={name,day,amt,note,pay,type,cat};
   if(remIdx>=0&&remIdx<st.reminders.length){st.reminders[remIdx]={...st.reminders[remIdx],...obj}}
   else{st.reminders.push({id:'r'+Date.now(),...obj})}
   save();closeRemMod();rSettings();rOvReminders();showT('✅ Tersimpan!');
