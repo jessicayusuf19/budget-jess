@@ -707,6 +707,23 @@ textarea{resize:vertical;min-height:100px;line-height:1.5}
   </div>
 </div>
 
+<!-- ACCOUNT DETAIL MODAL -->
+<div class="mover" id="accmod">
+  <div class="modal">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+      <h3 id="acc-mod-title"></h3>
+      <span id="acc-mod-bal" style="font-size:1.1rem;font-weight:900;color:#22c55e"></span>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:14px">
+      <button class="btn bg" onclick="openSMfromDetail('masuk')" style="flex:1;padding:9px">+ Masuk</button>
+      <button class="btn br" onclick="openSMfromDetail('keluar')" style="flex:1;padding:9px">− Keluar</button>
+      <button class="btn bw" onclick="openSMfromDetail('set')" style="flex:1;padding:9px">✏️ Set</button>
+    </div>
+    <div id="acc-mod-hist" style="max-height:55vh;overflow-y:auto"></div>
+    <button class="btn bw" onclick="closeAccDetail()" style="margin-top:14px">Tutup</button>
+  </div>
+</div>
+
 <!-- CC DETAIL MODAL -->
 <div class="mover" id="ccmod">
   <div class="modal">
