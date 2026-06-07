@@ -1473,11 +1473,9 @@ function openAccDetail(acc){
 }
 function closeAccDetail(){document.getElementById('accmod').classList.remove('open');currentAccDetail=null}
 function openSMfromDetail(type){
+  const acc=currentAccDetail;
   closeAccDetail();
-  if(currentAccDetail||smSt.acc){
-    const acc=currentAccDetail||smSt.acc;
-    setTimeout(()=>openSM(acc,type),100);
-  }
+  if(acc)setTimeout(()=>openSM(acc,type),150);
 }
 function delAccHist(acc,date,desc,amt,type){
   if(!confirm('Hapus riwayat ini?'))return;
