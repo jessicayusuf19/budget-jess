@@ -2220,8 +2220,8 @@ function unmarkRemPaid(id){
   const txId='rem_'+id+'_'+m;
   const pFound=st.pTx.find(t=>t.id===txId);
   const rFound=st.rtTx.find(t=>t.id===txId);
-  if(pFound){reverseAcc(pFound.pay,pFound.amt);st.pTx=st.pTx.filter(t=>t.id!==txId);}
-  if(rFound){reverseAcc(rFound.pay,rFound.amt);st.rtTx=st.rtTx.filter(t=>t.id!==txId);}
+  if(pFound){reverseAcc(pFound.pay,pFound.amt,pFound);st.pTx=st.pTx.filter(t=>t.id!==txId);}
+  if(rFound){reverseAcc(rFound.pay,rFound.amt,rFound);st.rtTx=st.rtTx.filter(t=>t.id!==txId);}
   save();rOvReminders();rPD();rRTD();showT('↩️ Dibatalkan & transaksi dihapus');
 }
 
