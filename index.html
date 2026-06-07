@@ -1944,10 +1944,12 @@ function markRemPaid(id){
 function unmarkRemPaid(id){
   const m=nowM();
   if(st.reminderPaid?.[m])delete st.reminderPaid[m][id];
-  // Hapus transaksi auto-generated
+  // Hapus transaksi auto-generated & reverse saldo
   const txId='rem_'+id+'_'+m;
-  st.pTx=st.pTx.filter(t=>t.id!==txId);
-  st.rtTx=st.rtTx.filter(t=>t.id!==txId);
+  const pFound=st.pTx.find(t=>t.id===txId);
+  const rFound=st.rtTx.find(t=>t.id===txId);
+  if(pFound){reverseAcc(pFound.pay,pFound.amt);st.pTx=st.pTx.filter(t=>t.id!==txId);}
+  if(rFound){reverseAcc(rFound.pay,rFound.amt);st.rtTx=st.rtTx.filter(t=>t.id!==txId);}
   save();rOvReminders();showT('↩️ Dibatalkan & transaksi dihapus');
 }
 
