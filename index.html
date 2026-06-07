@@ -1159,6 +1159,10 @@ let st=load();
 (function migrateRemPaid(){
   if(!st.reminderPaid)return;
   let changed=false;
+  function _ded(pay,amt){
+    if(pay==='Transfer BCA'||pay==='Cash')st.acc.bca1.balance=(st.acc.bca1.balance||0)-amt;
+    else if(pay==='Transfer BRI'||pay==='BRI')st.acc.bri.balance=(st.acc.bri.balance||0)-amt;
+  }
   Object.keys(st.reminderPaid).forEach(m=>{
     const paid=st.reminderPaid[m];
     Object.keys(paid||{}).forEach(id=>{
@@ -1170,9 +1174,9 @@ let st=load();
       const inRT=st.rtTx.find(t=>t.id===txId);
       if(inP||inRT)return; // already exists
       const txDate=m+'-'+String(rem.day||1).padStart(2,'0');
-      const tx={id:txId,date:txDate,desc:rem.name,amt:rem.amt,type:'expense',cat:rem.cat||rem.name,pay:rem.pay||''};
-      if(rem.type==='rt'){st.rtTx.push(tx);}
-      else{st.pTx.push(tx);}
+      const tx={id:txId,date:txDate,desc:rem.name,amt:rem.amt,type:'expense',cat:rem.cat||rem.name,pay:rem.pay||'',_ded:true};
+      if(rem.type==='rt'){st.rtTx.push(tx);_ded(tx.pay,tx.amt);}
+      else{st.pTx.push(tx);_ded(tx.pay,tx.amt);}
       changed=true;
     });
   });
