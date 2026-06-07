@@ -1410,19 +1410,53 @@ function openSM(acc,type){
   smSt={acc,type};
   const L={masuk:'+ Tambah ke',keluar:'− Tarik dari',set:'✏️ Set Saldo'};
   document.getElementById('smod-t').textContent=`${L[type]} ${st.acc[acc].name}`;
-  document.getElementById('smod-a').value='';document.getElementById('smod-d').value=type==='set'?'Set saldo awal':'';
+  document.getElementById('smod-a').value='';
+  document.getElementById('smod-d').value=type==='set'?'Set saldo awal':'';
+  document.getElementById('smod-date').value=today();
   document.getElementById('smod').classList.add('open');
 }
 function closeSM(){document.getElementById('smod').classList.remove('open')}
 function confirmSM(){
-  const amt=parseFloat(document.getElementById('smod-a').value),desc=document.getElementById('smod-d').value.trim()||'Tabungan';
+  const amt=parseFloat(document.getElementById('smod-a').value);
+  const desc=document.getElementById('smod-d').value.trim()||'Tabungan';
+  const date=document.getElementById('smod-date').value||today();
   if(!amt||amt<=0){showT('❌ Masukkan jumlah!');return}
   const{acc,type}=smSt;
   if(type==='set')st.acc[acc].balance=amt;
-  else if(type==='masuk'){st.acc[acc].balance=(st.acc[acc].balance||0)+amt;st.savH.unshift({date:today(),desc,amt,acc,type:'masuk'})}
-  else{st.acc[acc].balance=Math.max(0,(st.acc[acc].balance||0)-amt);st.savH.unshift({date:today(),desc,amt,acc,type:'keluar'})}
+  else if(type==='masuk'){st.acc[acc].balance=(st.acc[acc].balance||0)+amt;st.savH.unshift({date,desc,amt,acc,type:'masuk'})}
+  else{st.acc[acc].balance=Math.max(0,(st.acc[acc].balance||0)-amt);st.savH.unshift({date,desc,amt,acc,type:'keluar'})}
   save();closeSM();rSav();showT('✅ Tersimpan!');
 }
+
+// ══════════════════════════
+// CC DETAIL MODAL
+// ══════════════════════════
+function openCCMod(payKey,label,billingDay){
+  const d=getCCData(payKey,billingDay);
+  document.getElementById('cc-mod-title').textContent=label;
+  document.getElementById('cc-mod-sub').textContent=`Periode: ${d.stmtStart} s/d hari ini · Jatuh tempo: ${d.nextBillStr}`;
+  const txs=[...st.pTx,...st.rtTx]
+    .filter(t=>t.pay===payKey&&t.date>=d.stmtStart)
+    .sort((a,b)=>b.date.localeCompare(a.date));
+  const total=txs.reduce((s,t)=>s+t.amt,0);
+  document.getElementById('cc-mod-txs').innerHTML=txs.length
+    ?`<div style="background:#fef3c7;border-radius:10px;padding:10px 14px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center">
+        <span style="font-size:.82rem;font-weight:700;color:#92400e">Total tagihan periode ini</span>
+        <span style="font-size:1rem;font-weight:900;color:#d97706">${fmtF(total)}</span>
+      </div>`
+      +txs.map(t=>`
+      <div class="txi">
+        <div class="txico" style="background:#fef3c7">${anyIco(t.cat||'')}</div>
+        <div class="txinfo">
+          <div class="txd">${t.desc}</div>
+          <div class="txm">${t.date} · ${t.cat||''}</div>
+        </div>
+        <div class="txa">${fmtF(t.amt)}</div>
+      </div>`).join('')
+    :`<div class="empty"><div class="ei">🎉</div><p>Belum ada transaksi periode ini</p></div>`;
+  document.getElementById('ccmod').classList.add('open');
+}
+function closeCCMod(){document.getElementById('ccmod').classList.remove('open')}
 function saveAN(n){
   const k={1:'bca1',2:'bca2',3:'bri'}[n],d={1:'BCA Operasional',2:'BCA Tabungan',3:'BRI'}[n];
   st.acc[k].name=document.getElementById('sn'+n).value||d;save();rSavBals();
