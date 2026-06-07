@@ -1085,6 +1085,7 @@ const TABS=['overview','pribadi','rt','saving','laporan','settings','sync'];
 function go(t){
   document.querySelectorAll('.tab').forEach((el,i)=>el.classList.toggle('active',TABS[i]===t));
   document.querySelectorAll('.content').forEach(el=>el.classList.toggle('active',el.id==='tab-'+t));
+  syncMobNav(t);
   if(t==='overview')rOV();
   if(t==='pribadi')rP();
   if(t==='rt')rRT();
