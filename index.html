@@ -1558,7 +1558,7 @@ function saveEdit(){
   }
   const newPay=t.type==='expense'?document.getElementById('e-pay').value:t.pay;
   // reverse old balance effect, apply new
-  if(t.type==='expense'){reverseAcc(t.pay,t.amt);deductAcc(newPay,amt);}
+  if(t.type==='expense'){reverseAcc(t.pay,t.amt,t);deductAcc(newPay,amt,t);}
   t.date=document.getElementById('e-date').value;
   t.desc=document.getElementById('e-desc').value.trim();
   t.amt=amt;
