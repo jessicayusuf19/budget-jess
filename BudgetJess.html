@@ -1390,7 +1390,7 @@ function savePTx(){
   if(pType==='expense'){
     t.cat=document.getElementById('p-cat').value;
     t.pay=document.getElementById('p-pay').value;
-    deductAcc(t.pay,amt);
+    deductAcc(t.pay,amt,t);
   }else{
     const dest=document.getElementById('p-dest').value;
     t.cat='Tabungan';t.dest=dest;
