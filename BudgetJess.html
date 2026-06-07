@@ -1189,7 +1189,7 @@ function rOV(){
 // ══════════════════════════
 function payToAcc(pay){
   if(!pay)return null;
-  if(pay==='Transfer BCA'||pay==='CC BCA')return'bca1';
+  if(pay==='Transfer BCA')return'bca1';
   if(pay==='Transfer BRI'||pay==='BRI')return'bri';
   return null; // Cash, CC CIMB, CC UOB tidak auto-deduct
 }
