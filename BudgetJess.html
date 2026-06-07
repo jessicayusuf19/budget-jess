@@ -719,7 +719,17 @@ textarea{resize:vertical;min-height:100px;line-height:1.5}
       <button class="btn br" onclick="openSMfromDetail('keluar')" style="flex:1;padding:9px">− Keluar</button>
       <button class="btn bw" onclick="openSMfromDetail('set')" style="flex:1;padding:9px">✏️ Set</button>
     </div>
-    <div id="acc-mod-hist" style="max-height:55vh;overflow-y:auto"></div>
+    <div id="acc-mod-hist" style="max-height:45vh;overflow-y:auto"></div>
+    <div id="savh-edit-wrap" style="display:none;background:var(--bg);border-radius:14px;padding:14px;margin-top:12px">
+      <div style="font-size:.82rem;font-weight:800;margin-bottom:10px;color:var(--text)">✏️ Edit Transaksi</div>
+      <div class="fld"><label>Tanggal</label><input type="date" id="savh-edit-date"></div>
+      <div class="fld"><label>Keterangan</label><input type="text" id="savh-edit-desc"></div>
+      <div class="fld"><label>Jumlah (Rp)</label><input type="number" id="savh-edit-amt" inputmode="numeric"></div>
+      <div style="display:flex;gap:8px">
+        <button class="btn bw" onclick="closeSavhEdit()" style="flex:1;padding:9px">Batal</button>
+        <button class="btn bp" onclick="saveSavhEdit()" style="flex:1;padding:9px">Simpan</button>
+      </div>
+    </div>
     <button class="btn bw" onclick="closeAccDetail()" style="margin-top:14px">Tutup</button>
   </div>
 </div>
