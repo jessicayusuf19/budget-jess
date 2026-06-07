@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.budgetjess.deploy</string>
+    <key>ProgramArguments</key>
+    <array>
+        <string>/bin/bash</string>
+        <string>/Users/Jessica/Documents/Claude/Projects/Jessica - finance/deploy_budget.sh</string>
+    </array>
+    <key>WatchPaths</key>
+    <array>
+        <string>/Users/Jessica/Documents/Claude/Projects/Jessica - finance/BudgetJess.html</string>
+    </array>
+    <key>StartInterval</key>
+    <integer>60</integer>
+    <key>ThrottleInterval</key>
+    <integer>1</integer>
+    <key>RunAtLoad</key>
+    <false/>
+    <key>StandardOutPath</key>
+    <string>/tmp/budgetjess_deploy.log</string>
+    <key>StandardErrorPath</key>
+    <string>/tmp/budgetjess_deploy_error.log</string>
+</dict>
+</plist>
