@@ -1168,24 +1168,23 @@ function forceResync(){
 }
 function runMigrations(){
   // ── 1: retroactive balance deduction for old transactions ──
-  st.pTx.forEach(tx=>{
+  function applyTxDed(tx){
     if(tx._ded)return;
     const pay=tx.pay||'';
-    if((pay==='Transfer BCA'||pay==='Cash')&&tx.type==='expense')
-      st.acc.bca1.balance=(st.acc.bca1.balance||0)-tx.amt;
-    else if((pay==='Transfer BRI'||pay==='BRI')&&tx.type==='expense')
-      st.acc.bri.balance=(st.acc.bri.balance||0)-tx.amt;
+    let acc=null;
+    if((pay==='Transfer BCA'||pay==='Cash')&&tx.type==='expense')acc='bca1';
+    else if((pay==='Transfer BRI'||pay==='BRI')&&tx.type==='expense')acc='bri';
+    if(acc){
+      st.acc[acc].balance=(st.acc[acc].balance||0)-tx.amt;
+      const histId='ded_'+tx.id;
+      if(!st.savH.find(h=>h.id===histId)){
+        st.savH.push({id:histId,date:tx.date||today(),desc:tx.desc||'Pengeluaran',amt:tx.amt,acc,type:'keluar',fromTx:true});
+      }
+    }
     tx._ded=true;
-  });
-  st.rtTx.forEach(tx=>{
-    if(tx._ded)return;
-    const pay=tx.pay||'';
-    if((pay==='Transfer BCA'||pay==='Cash')&&tx.type==='expense')
-      st.acc.bca1.balance=(st.acc.bca1.balance||0)-tx.amt;
-    else if((pay==='Transfer BRI'||pay==='BRI')&&tx.type==='expense')
-      st.acc.bri.balance=(st.acc.bri.balance||0)-tx.amt;
-    tx._ded=true;
-  });
+  }
+  st.pTx.forEach(applyTxDed);
+  st.rtTx.forEach(applyTxDed);
   // ── 2: sync already-paid reminders → transactions ──
   if(st.reminderPaid){
     Object.keys(st.reminderPaid).forEach(m=>{
