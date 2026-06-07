@@ -1950,7 +1950,7 @@ function unmarkRemPaid(id){
   const rFound=st.rtTx.find(t=>t.id===txId);
   if(pFound){reverseAcc(pFound.pay,pFound.amt);st.pTx=st.pTx.filter(t=>t.id!==txId);}
   if(rFound){reverseAcc(rFound.pay,rFound.amt);st.rtTx=st.rtTx.filter(t=>t.id!==txId);}
-  save();rOvReminders();showT('↩️ Dibatalkan & transaksi dihapus');
+  save();rOvReminders();rPD();rRTD();showT('↩️ Dibatalkan & transaksi dihapus');
 }
 
 function saveCCBillingDay(cc,val){
