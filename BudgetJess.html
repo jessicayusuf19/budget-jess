@@ -1465,16 +1465,18 @@ function openAccDetail(acc){
   document.getElementById('acc-mod-title').textContent='📋 '+a.name;
   document.getElementById('acc-mod-bal').textContent=fmtF(a.balance||0);
   const hist=[...st.savH].filter(h=>h.acc===acc).sort((a,b)=>b.date.localeCompare(a.date));
+  document.getElementById('savh-edit-wrap').style.display='none';
   document.getElementById('acc-mod-hist').innerHTML=hist.length
-    ?hist.map(h=>`
+    ?hist.map((h,i)=>`
       <div class="txi">
         <div class="txico" style="background:${h.type==='masuk'?'#dcfce7':'#fee2e2'}">${h.type==='masuk'?'📈':'📉'}</div>
         <div class="txinfo">
           <div class="txd">${h.desc}</div>
           <div class="txm">${h.date}</div>
         </div>
-        <div style="display:flex;align-items:center;gap:6px">
+        <div style="display:flex;align-items:center;gap:4px">
           <div class="txa${h.type==='masuk'?' pos':''}">${h.type==='masuk'?'+':'-'}${fmt(h.amt)}</div>
+          <button class="dbtn" onclick="openSavhEdit('${acc}',${i})">✏️</button>
           <button class="dbtn" onclick="delAccHist('${acc}','${h.date}','${h.desc}',${h.amt},'${h.type}')">🗑</button>
         </div>
       </div>`).join('')
