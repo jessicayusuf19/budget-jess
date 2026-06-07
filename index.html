@@ -892,21 +892,20 @@ textarea{resize:vertical;min-height:100px;line-height:1.5}
 <div class="mover" id="acceditmod">
   <div class="modal">
     <h3>✏️ Edit Rekening</h3>
-    <div class="frow">
-      <div class="fld" style="max-width:90px"><label>Icon</label><input type="text" id="ae-icon" placeholder="🏦" maxlength="4" style="font-size:1.3rem;text-align:center"></div>
-      <div class="fld"><label>Nama Rekening</label><input type="text" id="ae-name" placeholder="BCA Operasional"></div>
+    <div class="fld"><label>Nama Rekening</label><input type="text" id="ae-name" placeholder="BCA Operasional"></div>
+    <div class="fld">
+      <label>Pilih Icon</label>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px" id="ae-icon-grid"></div>
+      <div style="margin-top:6px;display:flex;align-items:center;gap:8px">
+        <span style="font-size:.75rem;color:#999">Atau ketik sendiri:</span>
+        <input type="text" id="ae-icon" placeholder="🏦" maxlength="4" style="width:54px;font-size:1.2rem;text-align:center;padding:4px;border:2px solid #e8e8f0;border-radius:8px">
+      </div>
     </div>
-    <div class="fld"><label>Warna Kartu</label>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px">
-        <div onclick="pickAccColor('#3b82f6')" style="width:32px;height:32px;border-radius:8px;background:#3b82f6;cursor:pointer;border:3px solid transparent" class="acc-cp" data-c="#3b82f6"></div>
-        <div onclick="pickAccColor('#22c55e')" style="width:32px;height:32px;border-radius:8px;background:#22c55e;cursor:pointer;border:3px solid transparent" class="acc-cp" data-c="#22c55e"></div>
-        <div onclick="pickAccColor('#f59e0b')" style="width:32px;height:32px;border-radius:8px;background:#f59e0b;cursor:pointer;border:3px solid transparent" class="acc-cp" data-c="#f59e0b"></div>
-        <div onclick="pickAccColor('#ef4444')" style="width:32px;height:32px;border-radius:8px;background:#ef4444;cursor:pointer;border:3px solid transparent" class="acc-cp" data-c="#ef4444"></div>
-        <div onclick="pickAccColor('#8b5cf6')" style="width:32px;height:32px;border-radius:8px;background:#8b5cf6;cursor:pointer;border:3px solid transparent" class="acc-cp" data-c="#8b5cf6"></div>
-        <div onclick="pickAccColor('#ec4899')" style="width:32px;height:32px;border-radius:8px;background:#ec4899;cursor:pointer;border:3px solid transparent" class="acc-cp" data-c="#ec4899"></div>
-        <div onclick="pickAccColor('#06b6d4')" style="width:32px;height:32px;border-radius:8px;background:#06b6d4;cursor:pointer;border:3px solid transparent" class="acc-cp" data-c="#06b6d4"></div>
-        <div onclick="pickAccColor('#84cc16')" style="width:32px;height:32px;border-radius:8px;background:#84cc16;cursor:pointer;border:3px solid transparent" class="acc-cp" data-c="#84cc16"></div>
-        <input type="color" id="ae-color" value="#3b82f6" style="width:32px;height:32px;border-radius:8px;border:none;padding:0;cursor:pointer" title="Pilih warna custom" onchange="pickAccColor(this.value)">
+    <div class="fld"><label>Pilih Warna Kartu</label>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px" id="ae-color-grid"></div>
+      <div style="margin-top:6px;display:flex;align-items:center;gap:8px">
+        <span style="font-size:.75rem;color:#999">Warna custom:</span>
+        <input type="color" id="ae-color" value="#3b82f6" style="width:36px;height:36px;border-radius:8px;border:none;padding:0;cursor:pointer" onchange="pickAccColor(this.value)">
       </div>
     </div>
     <div style="display:flex;gap:10px;margin-top:14px">
