@@ -1495,6 +1495,15 @@ function rSavBals(){
   const b1=st.acc.bca1.balance||0,b2=st.acc.bca2.balance||0,b3=st.acc.bri.balance||0,tot=b1+b2+b3;
   document.getElementById('s1n').textContent=st.acc.bca1.name;document.getElementById('s2n').textContent=st.acc.bca2.name;document.getElementById('s3n').textContent=st.acc.bri.name;
   document.getElementById('s1b').textContent=fmtF(b1);document.getElementById('s2b').textContent=fmtF(b2);document.getElementById('s3b').textContent=fmtF(b3);
+  // Apply custom colors & icons
+  function applyAccStyle(key,cardId,icoId,defColor1,defColor2){
+    const a=st.acc[key];const c=a.color||defColor1;
+    const card=document.getElementById(cardId);if(card)card.style.background='linear-gradient(135deg,'+c+','+shadeColor(c,-30)+')';
+    const ico=document.getElementById(icoId);if(ico)ico.textContent=a.icon||'🏦';
+  }
+  applyAccStyle('bca1','s1-card','s1-ico','#3b82f6');
+  applyAccStyle('bca2','s2-card','s2-ico','#22c55e');
+  applyAccStyle('bri','s3-card','s3-ico','#f59e0b');
   document.getElementById('s-tot').textContent=fmtF(tot);
   document.getElementById('hdr-sav').textContent='💰 '+fmt(tot);
   // Dana darurat (editable target)
