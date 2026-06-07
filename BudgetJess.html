@@ -1367,9 +1367,17 @@ function askD(id,src){pD=id;pS=src;document.getElementById('dmod').classList.add
 function closeDM(){document.getElementById('dmod').classList.remove('open');pD=pS=null}
 function confirmDel(){
   if(!pD)return;
-  if(pS==='p'){const t=st.pTx.find(x=>x.id===pD);if(t?.type==='saving'&&t.dest)st.acc[t.dest].balance=Math.max(0,(st.acc[t.dest].balance||0)-t.amt);st.pTx=st.pTx.filter(x=>x.id!==pD)}
-  else st.rtTx=st.rtTx.filter(x=>x.id!==pD);
-  save();closeDM();if(pS==='p')rPD();else rRTD();showT('🗑 Dihapus');
+  if(pS==='p'){
+    const t=st.pTx.find(x=>x.id===pD);
+    if(t?.type==='saving'&&t.dest)st.acc[t.dest].balance=Math.max(0,(st.acc[t.dest].balance||0)-t.amt);
+    if(t?.type==='expense')reverseAcc(t.pay,t.amt);
+    st.pTx=st.pTx.filter(x=>x.id!==pD);
+  }else{
+    const t=st.rtTx.find(x=>x.id===pD);
+    if(t)reverseAcc(t.pay,t.amt);
+    st.rtTx=st.rtTx.filter(x=>x.id!==pD);
+  }
+  save();closeDM();if(pS==='p')rPD();else rRTD();rSavBals();showT('🗑 Dihapus');
 }
 
 // ══════════════════════════
