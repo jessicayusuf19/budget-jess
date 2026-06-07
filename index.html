@@ -1142,6 +1142,30 @@ function save(){
 }
 let st=load();
 
+function forceResync(){
+  if(!confirm('Sinkronkan ulang semua saldo dan transaksi dari biaya rutin? Proses ini akan menghitung ulang dari awal.'))return;
+  // Reset all _ded flags so migration runs fresh
+  st.pTx.forEach(t=>{delete t._ded;});
+  st.rtTx.forEach(t=>{delete t._ded;});
+  // Reset account balances to 0 before recalculating
+  // Keep manual savH entries (masuk/keluar/set) as source of truth for base balance
+  // Recalculate from savH
+  ['bca1','bca2','bri'].forEach(k=>{
+    let bal=0;
+    const history=(st.savH||[]).filter(h=>h.acc===k).sort((a,b)=>a.date?.localeCompare(b.date||'')||0);
+    history.forEach(h=>{
+      if(h.type==='set')bal=h.amt;
+      else if(h.type==='masuk')bal+=h.amt;
+      else if(h.type==='keluar')bal-=h.amt;
+    });
+    st.acc[k].balance=bal;
+  });
+  runMigrations();
+  save();
+  if(fbConnected&&fbRef)fbRef.set(st);
+  rSavBals();rPD();rRTD();rOV();
+  showT('✅ Saldo & transaksi berhasil disinkronkan!');
+}
 function runMigrations(){
   // ── 1: retroactive balance deduction for old transactions ──
   st.pTx.forEach(tx=>{
