@@ -2109,8 +2109,8 @@ function markRemPaid(id){
   const rem=(st.reminders||[]).find(r=>r.id===id);
   if(rem&&rem.amt>0&&rem.type&&rem.type!=='tabungan'){
     const tx={id:'rem_'+id+'_'+m,date:today(),desc:rem.name,amt:rem.amt,type:'expense',cat:rem.cat||rem.name,pay:rem.pay||''};
-    if(rem.type==='rt'){if(!st.rtTx.find(t=>t.id===tx.id)){st.rtTx.unshift(tx);deductAcc(tx.pay,tx.amt);}}
-    else if(rem.type==='pribadi'){if(!st.pTx.find(t=>t.id===tx.id)){st.pTx.unshift(tx);deductAcc(tx.pay,tx.amt);}}
+    if(rem.type==='rt'){if(!st.rtTx.find(t=>t.id===tx.id)){st.rtTx.unshift(tx);deductAcc(tx.pay,tx.amt,tx);}}
+    else if(rem.type==='pribadi'){if(!st.pTx.find(t=>t.id===tx.id)){st.pTx.unshift(tx);deductAcc(tx.pay,tx.amt,tx);}}
     save();rOvReminders();rPD();rRTD();showT('✅ Lunas & transaksi tercatat otomatis!');
   } else {
     save();rOvReminders();showT('✅ Ditandai lunas!');
