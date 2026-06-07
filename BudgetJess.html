@@ -1410,11 +1410,14 @@ function saveEdit(){
     const diff=amt-t.amt;
     st.acc[t.dest].balance=(st.acc[t.dest].balance||0)+diff;
   }
+  const newPay=t.type==='expense'?document.getElementById('e-pay').value:t.pay;
+  // reverse old balance effect, apply new
+  if(t.type==='expense'){reverseAcc(t.pay,t.amt);deductAcc(newPay,amt);}
   t.date=document.getElementById('e-date').value;
   t.desc=document.getElementById('e-desc').value.trim();
   t.amt=amt;
-  if(t.type==='expense'){t.cat=document.getElementById('e-cat').value;t.pay=document.getElementById('e-pay').value}
-  save();closeEM();if(eSrc==='p')rPD();else rRTD();showT('✅ Diupdate!');
+  if(t.type==='expense'){t.cat=document.getElementById('e-cat').value;t.pay=newPay;}
+  save();closeEM();if(eSrc==='p')rPD();else rRTD();rSavBals();showT('✅ Diupdate!');
 }
 
 // ══════════════════════════
