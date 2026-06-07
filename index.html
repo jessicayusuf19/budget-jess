@@ -1343,9 +1343,10 @@ function saveRTTx(){
     showT(`✅ ${n} cicilan tersimpan!`);rRTD();rCCBilling();return;
   }
   const t={id:'rt'+Date.now(),date,desc,amt,type:'expense',cat:document.getElementById('rt-cat').value,pay:document.getElementById('rt-pay').value};
+  deductAcc(t.pay,amt);
   st.rtTx.unshift(t);save();
   document.getElementById('rt-desc').value='';document.getElementById('rt-amt').value='';document.getElementById('rt-date').value=today();
-  showT('✅ Tersimpan!');rRTD();
+  showT('✅ Tersimpan!');rRTD();rSavBals();
 }
 
 // ══════════════════════════
