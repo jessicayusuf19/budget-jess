@@ -1703,8 +1703,8 @@ function rSettings(){
   const rems=st.reminders||[];
   document.getElementById('set-reminders').innerHTML=rems.length?rems.map((r,i)=>`
     <div class="cat-item">
-      <div class="cat-ico-lbl">🔔</div>
-      <div class="cat-name-lbl" style="flex:1"><b>${r.name}</b><span style="font-size:.76rem;color:#888;margin-left:6px">tgl ${r.day}${r.amt?` · ${fmt(r.amt)}`:''}${r.note?` · ${r.note}`:''}</span></div>
+      <div class="cat-ico-lbl">${r.icon||'🔔'}</div>
+      <div class="cat-name-lbl" style="flex:1"><b>${r.name}</b><span style="font-size:.76rem;color:#888;margin-left:6px">tgl ${r.day}${r.amt?` · ${fmt(r.amt)}`:''}${r.pay?` · ${r.pay}`:''}${r.note?` · ${r.note}`:''}</span></div>
       <button class="cat-act-btn" onclick="openRemMod(${i})" title="Edit">✏️</button>
       <button class="cat-act-btn" onclick="delRem(${i})" title="Hapus">🗑</button>
     </div>`).join(''):'<div class="empty" style="padding:14px"><p>Belum ada reminder</p></div>';
