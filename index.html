@@ -1104,7 +1104,7 @@ function initFirebase(cfg){
       const data=snap.val();
       if(data){
         const remoteStr=JSON.stringify(data),localStr=JSON.stringify(st);
-        if(remoteStr!==localStr){st={...DEF,...data};if(!st.xi)st.xi={};if(!st.budgets)st.budgets={};localStorage.setItem('jb_v5',JSON.stringify(st));rerenderCurrent();}
+        if(remoteStr!==localStr){st={...DEF,...data};if(!st.xi)st.xi={};if(!st.budgets)st.budgets={};runMigrations();localStorage.setItem('jb_v5',JSON.stringify(st));fbRef.set(st);rerenderCurrent();}
       }else{fbRef.set(st)}
       setSyncStatus('connected');
     },(err)=>{console.error(err);setSyncStatus('error');fbConnected=false;showT('❌ Gagal: '+err.message)});
