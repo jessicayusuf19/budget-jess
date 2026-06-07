@@ -1992,6 +1992,116 @@ function openAddGoalSaving(idx){
 }
 
 // ══════════════════════════
+// DARK MODE
+// ══════════════════════════
+function toggleDark(){
+  const isDark=document.documentElement.getAttribute('data-theme')==='dark';
+  const next=isDark?'light':'dark';
+  document.documentElement.setAttribute('data-theme',next);
+  localStorage.setItem('jb_theme',next);
+  document.getElementById('dark-toggle').textContent=next==='dark'?'☀️ Light':'🌙 Dark';
+}
+function initTheme(){
+  const t=localStorage.getItem('jb_theme')||'light';
+  document.documentElement.setAttribute('data-theme',t);
+  const btn=document.getElementById('dark-toggle');
+  if(btn)btn.textContent=t==='dark'?'☀️ Light':'🌙 Dark';
+}
+
+// ══════════════════════════
+// MOBILE NAV SYNC
+// ══════════════════════════
+function syncMobNav(t){
+  document.querySelectorAll('.mnb').forEach(b=>b.classList.remove('active'));
+  const el=document.getElementById('mn-'+t);
+  if(el)el.classList.add('active');
+}
+
+// ══════════════════════════
+// BUDGET NOTIFICATIONS
+// ══════════════════════════
+function checkBudgetAlerts(){
+  const el=document.getElementById('budget-alerts');
+  if(!el)return;
+  const bud=st.budgets||{};
+  const m=nowM();
+  const p=pMD(m),rt=rtMD(m);
+  const allCats={...p.cats};
+  Object.entries(rt.cats).forEach(([c,v])=>{allCats[c]=(allCats[c]||0)+v});
+  const alerts=[];
+  Object.entries(bud).forEach(([cat,limit])=>{
+    const spent=allCats[cat]||0;
+    if(!limit||!spent)return;
+    const pct=spent/limit*100;
+    if(pct>=100)alerts.push({cat,spent,limit,pct,type:'over'});
+    else if(pct>=80)alerts.push({cat,spent,limit,pct,type:'warn'});
+  });
+  if(!alerts.length){el.innerHTML='';return}
+  el.innerHTML=alerts.map(a=>`
+    <div class="budget-alert ${a.type}">
+      <span style="font-size:1.1rem">${a.type==='over'?'🚨':'⚠️'}</span>
+      <div><b>${a.cat}</b> — ${a.type==='over'?'OVER BUDGET':'Mendekati limit'}: ${fmtF(a.spent)} / ${fmtF(a.limit)} (${Math.round(a.pct)}%)</div>
+    </div>`).join('');
+}
+
+// ══════════════════════════
+// EXPORT CSV
+// ══════════════════════════
+function exportCSV(){
+  const m=lapM;
+  const all=[
+    ...st.pTx.filter(t=>t.date.slice(0,7)===m).map(t=>({...t,src:'Pribadi'})),
+    ...st.rtTx.filter(t=>t.date.slice(0,7)===m).map(t=>({...t,src:'RT'}))
+  ].sort((a,b)=>b.date.localeCompare(a.date));
+  if(!all.length){showT('⚠️ Tidak ada data bulan ini');return}
+  const rows=[['Tanggal','Keterangan','Kategori','Bayar via','Jumlah','Tipe','Sumber']];
+  all.forEach(t=>rows.push([t.date,t.desc,t.cat||'',t.pay||'',t.amt,t.type,t.src]));
+  const csv=rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob=new Blob(['﻿'+csv],{type:'text/csv;charset=utf-8'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download=`BudgetJess_${m}.csv`;a.click();
+  showT('✅ CSV didownload!');
+}
+function exportAllCSV(){
+  const ms=allM();
+  const rows=[['Bulan','Tanggal','Keterangan','Kategori','Bayar via','Jumlah','Tipe','Sumber']];
+  ms.forEach(m=>{
+    [...st.pTx.filter(t=>t.date.slice(0,7)===m).map(t=>({...t,src:'Pribadi'})),
+     ...st.rtTx.filter(t=>t.date.slice(0,7)===m).map(t=>({...t,src:'RT'}))]
+    .sort((a,b)=>b.date.localeCompare(a.date))
+    .forEach(t=>rows.push([mN(m),t.date,t.desc,t.cat||'',t.pay||'',t.amt,t.type,t.src]));
+  });
+  if(rows.length<=1){showT('⚠️ Belum ada data');return}
+  const csv=rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob=new Blob(['﻿'+csv],{type:'text/csv;charset=utf-8'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download=`BudgetJess_Semua_${new Date().toISOString().slice(0,10)}.csv`;a.click();
+  showT('✅ Semua data didownload!');
+}
+function exportPDF(){
+  window.print();
+}
+
+// ══════════════════════════
+// LAPORAN TREND CHART
+// ══════════════════════════
+let lapTrend=null;
+function rLapTrend(){
+  const ms=allM();
+  const labels=ms.map(mS);
+  const pData=ms.map(m=>Math.round(pMD(m).total/1000));
+  const rtData=ms.map(m=>Math.round(rtMD(m).total/1000));
+  const incData=ms.map(m=>Math.round(pMD(m).inc/1000));
+  const c=document.getElementById('lap-trend');if(!c)return;
+  if(lapTrend)lapTrend.destroy();
+  lapTrend=new Chart(c,{type:'line',data:{labels,datasets:[
+    {label:'Income',data:incData,borderColor:'#22c55e',backgroundColor:'rgba(34,197,94,.1)',tension:.35,fill:true,pointRadius:4},
+    {label:'Pribadi',data:pData,borderColor:'#6c63ff',backgroundColor:'rgba(108,99,255,.08)',tension:.35,fill:true,pointRadius:4},
+    {label:'Rumah Tangga',data:rtData,borderColor:'#f59e0b',backgroundColor:'rgba(245,158,11,.08)',tension:.35,fill:false,pointRadius:4}
+  ]},options:{plugins:{legend:{position:'bottom',labels:{font:{size:11},padding:10}}},scales:{y:{ticks:{callback:v=>v+'rb'},grid:{color:'rgba(150,150,150,.1)'}},x:{grid:{display:false}}},responsive:true,maintainAspectRatio:true}});
+}
+
+// ══════════════════════════
 // TOAST
 // ══════════════════════════
 function showT(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2000)}
