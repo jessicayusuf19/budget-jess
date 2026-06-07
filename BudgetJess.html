@@ -228,8 +228,13 @@ textarea{resize:vertical;min-height:100px;line-height:1.5}
 <body>
 
 <header class="main-hdr">
-  <h1>💰 Budget Dashboard – Jessica</h1>
-  <p>Pribadi · Rumah Tangga · 3 Rekening</p>
+  <div style="display:flex;justify-content:space-between;align-items:flex-start">
+    <div>
+      <h1>💰 Budget Dashboard – Jessica</h1>
+      <p>Pribadi · Rumah Tangga · 3 Rekening</p>
+    </div>
+    <button class="dark-btn" onclick="toggleDark()" id="dark-toggle">🌙 Dark</button>
+  </div>
   <div class="hdr-badges">
     <span class="badge" id="hdr-period">2026</span>
     <span class="badge" id="hdr-status">Memuat...</span>
