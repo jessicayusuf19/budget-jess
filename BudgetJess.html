@@ -1489,6 +1489,37 @@ function openSMfromDetail(type){
   closeAccDetail();
   if(acc)setTimeout(()=>openSM(acc,type),150);
 }
+let savhEditIdx=-1, savhEditAcc=null;
+function openSavhEdit(acc,idx){
+  const hist=[...st.savH].filter(h=>h.acc===acc).sort((a,b)=>b.date.localeCompare(a.date));
+  const h=hist[idx];
+  if(!h)return;
+  // find real index in st.savH
+  savhEditIdx=st.savH.findIndex(x=>x.acc===acc&&x.date===h.date&&x.desc===h.desc&&x.amt===h.amt&&x.type===h.type);
+  savhEditAcc=acc;
+  document.getElementById('savh-edit-date').value=h.date;
+  document.getElementById('savh-edit-desc').value=h.desc;
+  document.getElementById('savh-edit-amt').value=h.amt;
+  document.getElementById('savh-edit-wrap').style.display='block';
+}
+function closeSavhEdit(){
+  document.getElementById('savh-edit-wrap').style.display='none';
+  savhEditIdx=-1;savhEditAcc=null;
+}
+function saveSavhEdit(){
+  if(savhEditIdx<0)return;
+  const h=st.savH[savhEditIdx];
+  const newAmt=parseFloat(document.getElementById('savh-edit-amt').value);
+  const newDate=document.getElementById('savh-edit-date').value;
+  const newDesc=document.getElementById('savh-edit-desc').value.trim();
+  if(!newAmt||newAmt<=0){showT('❌ Jumlah tidak valid');return}
+  // adjust balance
+  const diff=newAmt-h.amt;
+  if(h.type==='masuk')st.acc[savhEditAcc].balance=(st.acc[savhEditAcc].balance||0)+diff;
+  else st.acc[savhEditAcc].balance=Math.max(0,(st.acc[savhEditAcc].balance||0)-diff);
+  st.savH[savhEditIdx]={...h,date:newDate,desc:newDesc,amt:newAmt};
+  save();closeSavhEdit();openAccDetail(savhEditAcc);rSavBals();showT('✅ Diupdate!');
+}
 function delAccHist(acc,date,desc,amt,type){
   if(!confirm('Hapus riwayat ini?'))return;
   // reverse balance
