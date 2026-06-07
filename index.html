@@ -1286,8 +1286,16 @@ function savePTx(){
     showT(`✅ ${n} cicilan tersimpan!`);rPD();rCCBilling();return;
   }
   const t={id:Date.now().toString(),date,desc,amt,type:pType};
-  if(pType==='expense'){t.cat=document.getElementById('p-cat').value;t.pay=document.getElementById('p-pay').value}
-  else{const dest=document.getElementById('p-dest').value;t.cat='Tabungan';t.dest=dest;st.acc[dest].balance=(st.acc[dest].balance||0)+amt;st.savH.unshift({date,desc,amt,acc:dest,type:'masuk'})}
+  if(pType==='expense'){
+    t.cat=document.getElementById('p-cat').value;
+    t.pay=document.getElementById('p-pay').value;
+    deductAcc(t.pay,amt);
+  }else{
+    const dest=document.getElementById('p-dest').value;
+    t.cat='Tabungan';t.dest=dest;
+    st.acc[dest].balance=(st.acc[dest].balance||0)+amt;
+    st.savH.unshift({date,desc,amt,acc:dest,type:'masuk'});
+  }
   st.pTx.unshift(t);save();
   document.getElementById('p-desc').value='';document.getElementById('p-amt').value='';document.getElementById('p-date').value=today();
   showT('✅ Tersimpan!');rPD();rSavBals();
