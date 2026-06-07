@@ -2113,6 +2113,7 @@ function showT(m){const t=document.getElementById('toast');t.textContent=m;t.cla
 // INIT
 // ══════════════════════════
 document.addEventListener('DOMContentLoaded',()=>{
+  initTheme();
   document.getElementById('p-date').value=today();
   document.getElementById('rt-date').value=today();
   refreshCatDropdowns();
@@ -2121,6 +2122,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     document.getElementById('fb-key-input')&&(document.getElementById('fb-key-input').value=cfg.syncKey||'');
     initFirebase(cfg);
   }else{setSyncStatus('off')}
+  syncMobNav('overview');
   rOV();
 });
 </script>
