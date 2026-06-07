@@ -1291,9 +1291,10 @@ function payToAcc(pay){
   if(pay==='Transfer BRI'||pay==='BRI')return'bri';
   return null; // CC CIMB, CC UOB, CC BCA tidak auto-deduct
 }
-function deductAcc(pay,amt){
+function deductAcc(pay,amt,tx){
   const acc=payToAcc(pay);
-  if(acc)st.acc[acc].balance=Math.max(0,(st.acc[acc].balance||0)-amt);
+  if(acc)st.acc[acc].balance=(st.acc[acc].balance||0)-amt; // allow negative
+  if(tx)tx._ded=true;
 }
 function reverseAcc(pay,amt){
   const acc=payToAcc(pay);
