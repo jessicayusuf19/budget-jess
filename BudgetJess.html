@@ -1765,8 +1765,10 @@ function delAccHist(acc,date,desc,amt,type){
 // ══════════════════════════
 // CC DETAIL MODAL
 // ══════════════════════════
+let ccModCurrent={};
 function openCCMod(payKey,label,billingDay){
   const d=getCCData(payKey,billingDay);
+  ccModCurrent={payKey,label,billingDay,stmtStart:d.stmtStart,nextBillStr:d.nextBillStr};
   document.getElementById('cc-mod-title').textContent=label;
   document.getElementById('cc-mod-sub').textContent=`Periode: ${d.stmtStart} s/d hari ini · Jatuh tempo: ${d.nextBillStr}`;
   const txs=[...st.pTx,...st.rtTx]
@@ -1788,7 +1790,57 @@ function openCCMod(payKey,label,billingDay){
         <div class="txa">${fmtF(t.amt)}</div>
       </div>`).join('')
     :`<div class="empty"><div class="ei">🎉</div><p>Belum ada transaksi periode ini</p></div>`;
+  // Pay section
+  renderCCPaySection(payKey,d.stmtStart,total);
   document.getElementById('ccmod').classList.add('open');
+}
+function renderCCPaySection(payKey,stmtStart,total){
+  const paidKey='cc_paid_'+payKey+'_'+stmtStart;
+  const isPaid=!!(st.ccPaid||{})[paidKey];
+  const sec=document.getElementById('cc-mod-pay-section');
+  if(!sec)return;
+  if(total<=0){sec.innerHTML='';return;}
+  if(isPaid){
+    sec.innerHTML=`<div style="background:#dcfce7;border-radius:12px;padding:12px 16px;display:flex;justify-content:space-between;align-items:center">
+      <span style="font-size:.85rem;font-weight:800;color:#16a34a">✅ Tagihan sudah dibayar & dipotong dari BCA Operasional</span>
+      <button onclick="unPayCC('${payKey}','${stmtStart}',${total})" style="font-size:.72rem;border:none;background:#f0fdf4;color:#999;border-radius:7px;padding:4px 10px;cursor:pointer">Batal</button>
+    </div>`;
+  } else {
+    sec.innerHTML=`<div style="background:#eff6ff;border-radius:12px;padding:12px 16px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <span style="font-size:.82rem;font-weight:700;color:#1d4ed8">💳 Bayar tagihan sekarang?</span>
+        <span style="font-size:.95rem;font-weight:900;color:#1d4ed8">${fmtF(total)}</span>
+      </div>
+      <div style="font-size:.74rem;color:#64748b;margin-bottom:10px">Akan dipotong dari <b>BCA Operasional</b> dan dicatat sebagai transaksi</div>
+      <button onclick="payCC('${payKey}','${stmtStart}',${total})" style="width:100%;border:none;background:#3b82f6;color:#fff;border-radius:10px;padding:10px;font-size:.88rem;font-weight:800;cursor:pointer">💰 Bayar & Potong BCA Operasional</button>
+    </div>`;
+  }
+}
+function payCC(payKey,stmtStart,total){
+  if(!confirm(`Bayar ${payKey} sebesar ${fmtF(total)} dan potong dari BCA Operasional?`))return;
+  if(!st.ccPaid)st.ccPaid={};
+  const paidKey='cc_paid_'+payKey+'_'+stmtStart;
+  st.ccPaid[paidKey]=true;
+  // Deduct BCA Operational
+  st.acc.bca1.balance=(st.acc.bca1.balance||0)-total;
+  // Record as transaction in Pribadi
+  const tx={id:'ccpay_'+payKey+'_'+stmtStart,date:today(),desc:`Bayar ${payKey}`,amt:total,type:'expense',cat:'Monthly Fixed',pay:'Transfer BCA',_ded:true};
+  if(!st.pTx.find(t=>t.id===tx.id))st.pTx.unshift(tx);
+  save();rSavBals();rPD();rCCBilling();
+  renderCCPaySection(payKey,stmtStart,total);
+  showT(`✅ ${payKey} dibayar! BCA Operasional berkurang ${fmtF(total)}`);
+}
+function unPayCC(payKey,stmtStart,total){
+  const paidKey='cc_paid_'+payKey+'_'+stmtStart;
+  if(st.ccPaid)delete st.ccPaid[paidKey];
+  // Reverse BCA deduction
+  st.acc.bca1.balance=(st.acc.bca1.balance||0)+total;
+  // Remove the payment transaction
+  const txId='ccpay_'+payKey+'_'+stmtStart;
+  st.pTx=st.pTx.filter(t=>t.id!==txId);
+  save();rSavBals();rPD();rCCBilling();
+  renderCCPaySection(payKey,stmtStart,total);
+  showT('↩️ Pembayaran CC dibatalkan');
 }
 function closeCCMod(){document.getElementById('ccmod').classList.remove('open')}
 function saveAN(n){
