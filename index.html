@@ -849,9 +849,14 @@ textarea{resize:vertical;min-height:100px;line-height:1.5}
 <div class="mover" id="remmod">
   <div class="modal">
     <h3 id="remmod-t">Tambah Pembayaran Rutin</h3>
-    <div class="frow">
-      <div class="fld" style="max-width:90px"><label>Icon</label><input type="text" id="rem-icon" placeholder="🔔" maxlength="4" style="font-size:1.3rem;text-align:center"></div>
-      <div class="fld"><label>Nama</label><input type="text" id="rem-name" placeholder="Pembantu, Langganan Netflix..."></div>
+    <div class="fld"><label>Nama</label><input type="text" id="rem-name" placeholder="Pembantu, Langganan Netflix..."></div>
+    <div class="fld">
+      <label>Pilih Icon</label>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px" id="rem-icon-grid"></div>
+      <div style="margin-top:6px;display:flex;align-items:center;gap:8px">
+        <span style="font-size:.75rem;color:#999">Atau ketik:</span>
+        <input type="text" id="rem-icon" placeholder="🔔" maxlength="4" style="width:54px;font-size:1.2rem;text-align:center;padding:4px;border:2px solid #e8e8f0;border-radius:8px">
+      </div>
     </div>
     <div class="frow">
       <div class="fld"><label>Tanggal (tiap bulan)</label><input type="number" id="rem-day" min="1" max="31" placeholder="1–31" inputmode="numeric"></div>
