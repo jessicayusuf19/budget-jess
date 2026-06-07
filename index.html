@@ -859,8 +859,19 @@ textarea{resize:vertical;min-height:100px;line-height:1.5}
       </div>
       <div class="fld"><label>Kategori</label><select id="rem-cat"></select></div>
     </div>
+    <div class="fld"><label>Metode Bayar</label>
+      <select id="rem-pay">
+        <option value="">— Pilih —</option>
+        <option value="Transfer BCA">🏦 Transfer BCA</option>
+        <option value="Transfer BRI">🏦 Transfer BRI</option>
+        <option value="CC BCA">💳 CC BCA</option>
+        <option value="CC CIMB">💳 CC CIMB</option>
+        <option value="CC UOB">💳 CC UOB</option>
+        <option value="Cash">💵 Cash</option>
+      </select>
+    </div>
     <div class="fld"><label>Catatan</label><input type="text" id="rem-note" placeholder="opsional"></div>
-    <p style="font-size:.74rem;color:#6c63ff;font-weight:600;margin-top:4px">💡 Saat Tandai Lunas → transaksi otomatis tercatat</p>
+    <p style="font-size:.74rem;color:#6c63ff;font-weight:600;margin-top:4px">💡 Saat Tandai Lunas → transaksi & saldo rekening otomatis terupdate</p>
     <div style="display:flex;gap:10px;margin-top:4px">
       <button class="btn bw" onclick="closeRemMod()" style="flex:1">Batal</button>
       <button class="btn bp" onclick="saveRem()" style="flex:1">Simpan</button>
