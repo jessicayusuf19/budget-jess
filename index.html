@@ -1438,14 +1438,15 @@ function saveRTTx(){
     const n=parseInt(document.getElementById('rt-cicilan-n').value)||3;
     const base={id:'rt'+Date.now(),date,desc,amt,type:'expense',cat:document.getElementById('rt-cat').value,pay:document.getElementById('rt-pay').value};
     addCicilanTx(st.rtTx,base,n);
-    deductAcc(base.pay,base.amt);
+    deductAcc(base.pay,base.amt,base);
+    st.rtTx.filter(t=>t.id.startsWith(base.id)).forEach(t=>t._ded=true);
     save();
     document.getElementById('rt-desc').value='';document.getElementById('rt-amt').value='';document.getElementById('rt-date').value=today();
     document.getElementById('rt-is-cicilan').checked=false;document.getElementById('rt-cicilan-opts').style.display='none';
     showT(`✅ ${n} cicilan tersimpan!`);rRTD();rCCBilling();return;
   }
   const t={id:'rt'+Date.now(),date,desc,amt,type:'expense',cat:document.getElementById('rt-cat').value,pay:document.getElementById('rt-pay').value};
-  deductAcc(t.pay,amt);
+  deductAcc(t.pay,amt,t);
   st.rtTx.unshift(t);save();
   document.getElementById('rt-desc').value='';document.getElementById('rt-amt').value='';document.getElementById('rt-date').value=today();
   showT('✅ Tersimpan!');rRTD();rSavBals();
