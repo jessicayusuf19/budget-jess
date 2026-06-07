@@ -107,8 +107,9 @@ tr:last-child td{border-bottom:none}
 .ttb.as{background:#dbeafe;color:#1d4ed8;border-color:#93c5fd}
 
 /* ── CATEGORY BARS ── */
-.ci{display:flex;align-items:center;gap:10px;margin-bottom:8px;cursor:pointer;padding:10px 12px;border-radius:12px;border:1.5px solid #ededf7;background:#fafafe;transition:all .15s}
+.ci{display:flex;align-items:center;gap:10px;margin-bottom:8px;cursor:pointer;padding:10px 12px;border-radius:12px;border:1.5px solid var(--border);background:var(--bg);transition:all .15s}
 .ci:hover{background:#f0eeff;border-color:#c4baff;transform:translateX(2px)}
+[data-theme=dark] .ci:hover{background:#252540}
 .ci:last-child{margin-bottom:0}
 .cico{font-size:1rem;width:24px;text-align:center;flex-shrink:0}
 .cinfo{flex:1}
