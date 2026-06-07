@@ -2002,7 +2002,7 @@ function saveRem(){
   const cat=document.getElementById('rem-cat').value;
   if(!name||!day||day<1||day>31){showT('❌ Isi nama dan tanggal!');return}
   if(!st.reminders)st.reminders=[];
-  const obj={name,day,amt,note,pay,type,cat};
+  const obj={icon,name,day,amt,note,pay,type,cat};
   if(remIdx>=0&&remIdx<st.reminders.length){st.reminders[remIdx]={...st.reminders[remIdx],...obj}}
   else{st.reminders.push({id:'r'+Date.now(),...obj})}
   save();closeRemMod();rSettings();rOvReminders();showT('✅ Tersimpan!');
