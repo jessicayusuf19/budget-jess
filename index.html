@@ -46,9 +46,14 @@ body{font-family:'Segoe UI',-apple-system,sans-serif;background:var(--bg);color:
 .content{display:none;padding:20px 16px 36px;max-width:1200px;margin:0 auto}
 .content.active{display:block}
 
+/* ── BUDGET ALERT BANNER ── */
+.budget-alert{border-radius:12px;padding:11px 14px;margin-bottom:14px;font-size:.82rem;font-weight:700;display:flex;align-items:flex-start;gap:10px;line-height:1.5}
+.budget-alert.over{background:#fee2e2;color:#dc2626;border:1.5px solid #fca5a5}
+.budget-alert.warn{background:#fef3c7;color:#d97706;border:1.5px solid #fcd34d}
+
 /* ── KPI ── */
 .kgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:20px}
-.kpi{background:#fff;border-radius:14px;padding:16px;box-shadow:0 2px 8px rgba(0,0,0,.06);border-left:4px solid #6c63ff}
+.kpi{background:var(--card);border-radius:14px;padding:16px;box-shadow:0 2px 8px rgba(0,0,0,.06);border-left:4px solid #6c63ff}
 .kpi.g{border-left-color:#22c55e}.kpi.r{border-left-color:#ef4444}.kpi.o{border-left-color:#f59e0b}.kpi.b{border-left-color:#3b82f6}
 .kpi label{font-size:.7rem;color:#999;text-transform:uppercase;letter-spacing:.4px;font-weight:700}
 .kpi .v{font-size:1.1rem;font-weight:800;margin-top:5px}
