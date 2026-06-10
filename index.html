@@ -1187,7 +1187,15 @@ function runMigrations(){
   }
   st.pTx.forEach(applyTxDed);
   st.rtTx.forEach(applyTxDed);
-  // ── 2: sync already-paid reminders → transactions ──
+  // ── 2: pindahkan pTx dengan Transfer BRI/BRI → rtTx ──
+  const briInP=st.pTx.filter(t=>BRI_METHODS.includes(t.pay||'')&&t.type==='expense');
+  if(briInP.length){
+    briInP.forEach(t=>{
+      if(!st.rtTx.find(r=>r.id===t.id))st.rtTx.push(t);
+    });
+    st.pTx=st.pTx.filter(t=>!BRI_METHODS.includes(t.pay||'')||t.type!=='expense');
+  }
+  // ── 3: sync already-paid reminders → transactions ──
   if(st.reminderPaid){
     Object.keys(st.reminderPaid).forEach(m=>{
       const paid=st.reminderPaid[m];
