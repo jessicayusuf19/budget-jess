@@ -1435,6 +1435,13 @@ function savePTx(){
     t.cat=document.getElementById('p-cat').value;
     t.pay=document.getElementById('p-pay').value;
     deductAcc(t.pay,amt,t);
+    // Transfer BRI → otomatis masuk Rumah Tangga
+    if(BRI_METHODS.includes(t.pay)){
+      t.id='rt'+t.id;
+      st.rtTx.unshift(t);save();
+      document.getElementById('p-desc').value='';document.getElementById('p-amt').value='';document.getElementById('p-date').value=today();
+      showT('✅ Tersimpan di Rumah Tangga (Transfer BRI)!');rRTD();rSavBals();return;
+    }
   }else{
     const dest=document.getElementById('p-dest').value;
     t.cat='Tabungan';t.dest=dest;
