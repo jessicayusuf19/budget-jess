@@ -1045,16 +1045,19 @@ function buildCatOpts(which){
   return cats.map(c=>`<option value="${c.name}">${c.ico} ${c.name}</option>`).join('');
 }
 function getPayMethods(){return st.payMethods||DEF_PAYMETHODS}
+const BRI_METHODS=['Transfer BRI','BRI'];
 function buildPayOpts(src){
-  return getPayMethods().map(m=>`<option value="${m}">${m.startsWith('CC')?'💳':m.startsWith('Transfer')?'🏦':'💵'} ${m}</option>`).join('');
+  return getPayMethods()
+    .filter(m=>src==='p'?!BRI_METHODS.includes(m):true) // BRI only in RT
+    .map(m=>`<option value="${m}">${m.startsWith('CC')?'💳':m.startsWith('Transfer')?'🏦':'💵'} ${m}</option>`).join('');
 }
 function refreshCatDropdowns(){
   const pc=document.getElementById('p-cat');if(pc)pc.innerHTML=buildCatOpts('p');
   const rtc=document.getElementById('rt-cat');if(rtc)rtc.innerHTML=buildCatOpts('rt');
   const ec=document.getElementById('e-cat');if(ec)ec.innerHTML=buildCatOpts('p')+buildCatOpts('rt');
   const bc=document.getElementById('bud-cat');if(bc)bc.innerHTML=buildCatOpts('p')+buildCatOpts('rt');
-  const pp=document.getElementById('p-pay');if(pp){const v=pp.value;pp.innerHTML=buildPayOpts();if(v)pp.value=v;}
-  const rp=document.getElementById('rt-pay');if(rp){const v=rp.value;rp.innerHTML=buildPayOpts();if(v)rp.value=v;}
+  const pp=document.getElementById('p-pay');if(pp){const v=pp.value;pp.innerHTML=buildPayOpts('p');if(v&&!BRI_METHODS.includes(v))pp.value=v;}
+  const rp=document.getElementById('rt-pay');if(rp){const v=rp.value;rp.innerHTML=buildPayOpts('rt');if(v)rp.value=v;}
   const ep=document.getElementById('e-pay');if(ep){const v=ep.value;ep.innerHTML=buildPayOpts();if(v)ep.value=v;}
 }
 
