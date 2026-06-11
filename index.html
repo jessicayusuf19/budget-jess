@@ -1238,7 +1238,8 @@ function allM(){
 }
 function pMD(ym){
   let cats={};let inc=(st.xi&&st.xi[ym])||0;
-  if(HP[ym]){inc=inc||HP[ym].inc;Object.entries(HP[ym].cats).forEach(([c,v])=>{cats[c]=(cats[c]||0)+v})}
+  const hasHistTx=st.pTx.some(t=>t._hist&&t.date.slice(0,7)===ym);
+  if(HP[ym]){inc=inc||HP[ym].inc;if(!hasHistTx&&HP[ym].cats)Object.entries(HP[ym].cats).forEach(([c,v])=>{cats[c]=(cats[c]||0)+v})}
   st.pTx.filter(t=>t.date.slice(0,7)===ym&&t.type==='expense').forEach(t=>{cats[t.cat]=(cats[t.cat]||0)+t.amt});
   return{inc,cats,total:Object.values(cats).reduce((a,b)=>a+b,0)};
 }
