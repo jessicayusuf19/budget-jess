@@ -1195,6 +1195,9 @@ function runMigrations(){
     });
     st.pTx=st.pTx.filter(t=>!BRI_METHODS.includes(t.pay||'')||t.type!=='expense');
   }
+  // ── 3b: inject HIST_TX (Excel import) into pTx once ──
+  const existHistIds=new Set(st.pTx.filter(t=>t._hist).map(t=>t.id));
+  HIST_TX.forEach(t=>{if(!existHistIds.has(t.id))st.pTx.push(t)});
   // ── 3: sync already-paid reminders → transactions ──
   if(st.reminderPaid){
     Object.keys(st.reminderPaid).forEach(m=>{
