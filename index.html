@@ -1492,6 +1492,7 @@ function rPD(){
     return`<div class="ci" onclick="openCatD('${c}','p','${pM}')"><div class="cico">${pIco(c)}</div><div class="cinfo"><div class="cname"><span>${c}</span><span class="camt">${fmt(v)}</span></div>${budHtml}<div class="ctrack"><div class="cfill" style="width:${pct}%;background:${barColor}"></div></div></div><span style="color:#6c63ff;font-size:.72rem;font-weight:700;flex-shrink:0;background:#ede9ff;padding:3px 8px;border-radius:20px">Detail ›</span></div>`;
   }).join(''):'<div class="empty"><div class="ei">📭</div><p>Belum ada data bulan ini</p></div>';
   const txs=st.pTx.filter(t=>t.date.slice(0,7)===pM).sort((a,b)=>b.date.localeCompare(a.date));
+  renderPaySummary(txs,'p-pay-sum');
   document.getElementById('p-txs').innerHTML=txs.length?txs.map(t=>txH(t,'p')).join(''):`<div class="empty" style="padding:14px"><p style="font-size:.79rem;color:#bbb">Belum ada transaksi.</p></div>`;
 }
 function checkCicilanShow(src){
