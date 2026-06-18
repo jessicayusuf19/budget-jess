@@ -613,9 +613,14 @@ textarea{resize:vertical;min-height:100px;line-height:1.5}
 
     <!-- CC Billing Dates -->
     <div class="card">
-      <h3>💳 Tanggal Tagihan Kartu Kredit</h3>
-      <p style="font-size:.78rem;color:#999;margin-bottom:14px;line-height:1.5">Tanggal jatuh tempo tagihan per bulan. Dipakai untuk hitung sisa hari & total tagihan berjalan.</p>
+      <div class="sec-hdr"><h3>💳 Kartu Kredit</h3><span style="font-size:.72rem;color:#bbb;font-weight:600">tap ✏️ untuk edit tgl</span></div>
+      <p style="font-size:.78rem;color:#999;margin-bottom:14px;line-height:1.5">Kelola kartu kredit kamu. Tanggal tagihan dipakai untuk hitung total CC berjalan.</p>
       <div id="set-cc"></div>
+      <div style="display:flex;gap:8px;margin-top:12px;padding-top:12px;border-top:1px solid #f0f0f8">
+        <input type="text" id="new-cc-name" placeholder="Nama CC baru, contoh: CC Mandiri" style="flex:1;padding:9px 12px;border:2px solid #e8e8f0;border-radius:10px;font-size:.84rem">
+        <input type="number" id="new-cc-day" placeholder="Tgl" min="1" max="31" style="width:70px;padding:9px 10px;border:2px solid #e8e8f0;border-radius:10px;font-size:.84rem">
+        <button class="btn bp" onclick="addCC()" style="white-space:nowrap">➕ Tambah</button>
+      </div>
     </div>
 
     <!-- Pembayaran Rutin -->
