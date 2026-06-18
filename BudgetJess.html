@@ -2247,12 +2247,8 @@ function getCCData(payKey,billingDay){
   return{spend,daysLeft,nextBillStr,stmtStart};
 }
 function rCCBilling(){
-  const cc=st.ccbilling||{cimb:21,bca:17,uob:11};
-  const cards=[
-    {key:'CC CIMB',label:'CC CIMB Niaga',day:cc.cimb,color:'#ef4444'},
-    {key:'CC BCA',label:'CC BCA',day:cc.bca,color:'#3b82f6'},
-    {key:'CC UOB',label:'CC UOB',day:cc.uob,color:'#8b5cf6'},
-  ];
+  const COLORS=['#ef4444','#3b82f6','#8b5cf6','#f59e0b','#22c55e','#ec4899','#14b8a6'];
+  const cards=getCCards().map((c,i)=>({key:c.name,label:c.name,day:c.day,color:COLORS[i%COLORS.length]}));
   document.getElementById('ov-cc').innerHTML=cards.map(c=>{
     const d=getCCData(c.key,c.day);
     const paidKey='cc_paid_'+c.key+'_'+d.stmtStart;
