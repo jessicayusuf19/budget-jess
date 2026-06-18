@@ -1593,6 +1593,7 @@ function rRTD(){
     return`<div class="ci" onclick="openCatD('${c}','rt','${rtM}')"><div class="cico">${rIco(c)}</div><div class="cinfo"><div class="cname"><span>${c}</span><span class="camt">${fmt(v)}</span></div>${budHtml}<div class="ctrack"><div class="cfill" style="width:${pct}%;background:${barColor}"></div></div></div><span style="color:#6c63ff;font-size:.72rem;font-weight:700;flex-shrink:0;background:#ede9ff;padding:3px 8px;border-radius:20px">Detail ›</span></div>`;
   }).join(''):'<div class="empty"><div class="ei">🏡</div><p>Belum ada data rumah tangga.<br>Mulai catat di form kiri.</p></div>';
   const txs=st.rtTx.filter(t=>t.date.slice(0,7)===rtM).sort((a,b)=>b.date.localeCompare(a.date));
+  renderPaySummary(txs,'rt-pay-sum');
   document.getElementById('rt-txs').innerHTML=txs.length?txs.map(t=>txH(t,'rt')).join(''):'<div class="empty"><div class="ei">🧾</div><p>Belum ada transaksi RT</p></div>';
 }
 function saveRTTx(){
