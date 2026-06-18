@@ -1501,6 +1501,7 @@ function selPM(m){pM=m;document.querySelectorAll('#p-chips .mc').forEach(c=>c.cl
 function renderPaySummary(txs,elId){
   const el=document.getElementById(elId);if(!el)return;
   const map={};
+  const src=elId==='p-pay-sum'?'p':'rt';
   txs.filter(t=>t.type==='expense'||!t.type).forEach(t=>{
     const p=t.pay||'Lainnya';
     map[p]=(map[p]||0)+t.amt;
@@ -1509,10 +1510,34 @@ function renderPaySummary(txs,elId){
   const pills=Object.entries(map).sort((a,b)=>b[1]-a[1]).map(([p,v])=>{
     const cls=p==='Cash'?'cash':p.startsWith('Transfer')?'transfer':p.startsWith('CC')?'cc':'';
     const ico=p==='Cash'?'💵':p.startsWith('Transfer')?'🏦':p.startsWith('CC')?'💳':'💸';
-    return`<div class="pay-pill ${cls}">${ico} ${p}<span style="margin-left:4px;opacity:.7">${fmt(v)}</span></div>`;
+    const month=src==='p'?pM:rtM;
+    return`<div class="pay-pill ${cls}" style="cursor:pointer" onclick="openPD('${p}','${month}','${src}')">${ico} ${p}<span style="margin-left:4px;opacity:.7">${fmt(v)}</span><span style="margin-left:5px;font-size:.68rem;opacity:.5">›</span></div>`;
   }).join('');
   el.innerHTML=`<div class="pay-sum">${pills}</div>`;
 }
+function openPD(pay,month,src){
+  const allTxs=src==='p'?st.pTx:src==='rt'?st.rtTx:[...st.pTx,...st.rtTx];
+  const txs=allTxs.filter(t=>t.date.slice(0,7)===month&&(t.pay||'Lainnya')===pay&&(t.type==='expense'||!t.type)).sort((a,b)=>b.date.localeCompare(a.date));
+  const total=txs.reduce((s,t)=>s+t.amt,0);
+  const ico=pay==='Cash'?'💵':pay.startsWith('Transfer')?'🏦':'💳';
+  document.getElementById('pd-ico').textContent=ico;
+  document.getElementById('pd-title').textContent=pay;
+  document.getElementById('pd-sub').textContent=`${mS(month)} · ${txs.length} transaksi · Total ${fmt(total)}`;
+  document.getElementById('pd-txs').innerHTML=txs.length?txs.map(t=>{
+    const tsrc=st.pTx.find(x=>x.id===t.id)?'p':'rt';
+    return`<div class="txi">
+      <div class="txico" style="background:#f5f3ff">${anyIco(t.cat||'')}</div>
+      <div class="txinfo"><div class="txd">${t.desc}</div><div class="txm">${t.date} · ${t.cat||''}</div></div>
+      <div style="display:flex;align-items:center;gap:3px">
+        <div class="txa">${fmt(t.amt)}</div>
+        <button class="dbtn" title="Edit" onclick="closePD();openEM('${t.id}','${tsrc}')">✏️</button>
+        <button class="dbtn" title="Hapus" onclick="closePD();askD('${t.id}','${tsrc}')">🗑</button>
+      </div>
+    </div>`;}).join('')
+    :`<div class="empty"><div class="ei">📭</div><p>Belum ada transaksi</p></div>`;
+  document.getElementById('paydetmod').classList.add('open');
+}
+function closePD(){document.getElementById('paydetmod').classList.remove('open');}
 function rPD(){
   const{inc,cats,total}=pMD(pM);
   document.getElementById('p-ctitle').textContent=`📊 Pribadi — ${mS(pM)}`;
