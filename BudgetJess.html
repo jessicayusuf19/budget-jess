@@ -1035,6 +1035,15 @@ function load(){
     if(!d.reminderPaid)d.reminderPaid={};
     if(d.payMethods===undefined)d.payMethods=null;
     if(!d.goals)d.goals=[];
+    // migrate ccards from ccbilling if not yet done
+    if(!d.ccards){
+      const cb=d.ccbilling||{cimb:21,bca:17,uob:11};
+      d.ccards=[
+        {key:'cimb',name:'CC CIMB',day:cb.cimb||21},
+        {key:'bca',name:'CC BCA',day:cb.bca||17},
+        {key:'uob',name:'CC UOB',day:cb.uob||11},
+      ];
+    }
     if(!d.danaDaruratTarget)d.danaDaruratTarget=90000000;
     return d;
   }catch{return JSON.parse(JSON.stringify(DEF))}
