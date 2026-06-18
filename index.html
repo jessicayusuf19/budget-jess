@@ -1741,9 +1741,32 @@ function openEM(id,src){
   if(ec&&t.cat){for(let o of ec.options){if(o.value===t.cat){o.selected=true;break}}}
   const ep=document.getElementById('e-pay');
   if(ep&&t.pay){for(let o of ep.options){if(o.value===t.pay){o.selected=true;break}}}
+  // show move button only for expense transactions
+  const moveRow=document.getElementById('e-move-row');
+  const moveBtn=document.getElementById('e-move-btn');
+  if(t.type==='expense'){
+    moveBtn.textContent=src==='p'?'🏡 Pindahkan ke Rumah Tangga':'👤 Pindahkan ke Pribadi';
+    moveRow.style.display='';
+  } else {
+    moveRow.style.display='none';
+  }
   document.getElementById('emod').classList.add('open');
 }
 function closeEM(){document.getElementById('emod').classList.remove('open');eId=eSrc=null}
+function moveTxFromEdit(){
+  if(!eId)return;
+  if(eSrc==='p'){
+    const t=st.pTx.find(x=>x.id===eId);if(!t)return;
+    st.pTx=st.pTx.filter(x=>x.id!==eId);
+    st.rtTx.unshift(t);
+    save();closeEM();rPD();rRTD();showT('✅ Dipindah ke Rumah Tangga!');
+  } else {
+    const t=st.rtTx.find(x=>x.id===eId);if(!t)return;
+    st.rtTx=st.rtTx.filter(x=>x.id!==eId);
+    st.pTx.unshift(t);
+    save();closeEM();rRTD();rPD();showT('✅ Dipindah ke Pribadi!');
+  }
+}
 function saveEdit(){
   if(!eId)return;
   const txs=eSrc==='p'?st.pTx:st.rtTx;
