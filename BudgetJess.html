@@ -1065,7 +1065,13 @@ function buildCatOpts(which){
   const cats=which==='p'?getPcats():getRtcats();
   return cats.map(c=>`<option value="${c.name}">${c.ico} ${c.name}</option>`).join('');
 }
-function getPayMethods(){return st.payMethods||DEF_PAYMETHODS}
+function getCCards(){return st.ccards||[{key:'cimb',name:'CC CIMB',day:21},{key:'bca',name:'CC BCA',day:17},{key:'uob',name:'CC UOB',day:11}]}
+function getPayMethods(){
+  const base=['Cash','Transfer BCA','Transfer BRI'];
+  const ccNames=getCCards().map(c=>c.name);
+  const custom=(st.payMethods||[]).filter(m=>!base.includes(m)&&!m.startsWith('CC'));
+  return[...base,...ccNames,...custom];
+}
 const BRI_METHODS=['Transfer BRI','BRI'];
 function buildPayOpts(src){
   return getPayMethods()
