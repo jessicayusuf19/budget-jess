@@ -1463,6 +1463,21 @@ function rP(){
   rPD();
 }
 function selPM(m){pM=m;document.querySelectorAll('#p-chips .mc').forEach(c=>c.classList.toggle('active',c.textContent===mS(m)));rPD()}
+function renderPaySummary(txs,elId){
+  const el=document.getElementById(elId);if(!el)return;
+  const map={};
+  txs.filter(t=>t.type==='expense'||!t.type).forEach(t=>{
+    const p=t.pay||'Lainnya';
+    map[p]=(map[p]||0)+t.amt;
+  });
+  if(!Object.keys(map).length){el.innerHTML='';return;}
+  const pills=Object.entries(map).sort((a,b)=>b[1]-a[1]).map(([p,v])=>{
+    const cls=p==='Cash'?'cash':p.startsWith('Transfer')?'transfer':p.startsWith('CC')?'cc':'';
+    const ico=p==='Cash'?'💵':p.startsWith('Transfer')?'🏦':p.startsWith('CC')?'💳':'💸';
+    return`<div class="pay-pill ${cls}">${ico} ${p}<span style="margin-left:4px;opacity:.7">${fmt(v)}</span></div>`;
+  }).join('');
+  el.innerHTML=`<div class="pay-sum">${pills}</div>`;
+}
 function rPD(){
   const{inc,cats,total}=pMD(pM);
   document.getElementById('p-ctitle').textContent=`📊 Pribadi — ${mS(pM)}`;
