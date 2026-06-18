@@ -1685,8 +1685,7 @@ function txH(t,src){
   const ico=anyIco(t.cat||t.type);
   const bg=t.type==='saving'?'#dbeafe':'#fef3c7';
   const pos=t.type==='saving';
-  const moveBtn=t.type==='expense'?`<button class="dbtn" title="${src==='p'?'Pindah ke Rumah Tangga':'Pindah ke Pribadi'}" onclick="moveTx('${t.id}','${src}')">${src==='p'?'🏡':'👤'}</button>`:'';
-  return`<div class="txi"><div class="txico" style="background:${bg}">${ico}</div><div class="txinfo"><div class="txd">${t.desc}</div><div class="txm">${t.date}${t.pay?' · '+t.pay:''} · ${t.cat||''}</div></div><div style="display:flex;align-items:center;gap:3px"><div class="txa${pos?' pos':''}">${pos?'+':'-'}${fmt(t.amt)}</div><button class="dbtn" title="Edit" onclick="openEM('${t.id}','${src}')">✏️</button>${moveBtn}<button class="dbtn" title="Hapus" onclick="askD('${t.id}','${src}')">🗑</button></div></div>`;
+  return`<div class="txi"><div class="txico" style="background:${bg}">${ico}</div><div class="txinfo"><div class="txd">${t.desc}</div><div class="txm">${t.date}${t.pay?' · '+t.pay:''} · ${t.cat||''}</div></div><div style="display:flex;align-items:center;gap:3px"><div class="txa${pos?' pos':''}">${pos?'+':'-'}${fmt(t.amt)}</div><button class="dbtn" title="Edit" onclick="openEM('${t.id}','${src}')">✏️</button><button class="dbtn" title="Hapus" onclick="askD('${t.id}','${src}')">🗑</button></div></div>`;
 }
 function moveTx(id,src){
   if(src==='p'){
