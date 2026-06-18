@@ -2369,6 +2369,48 @@ function saveCCBillingDay(cc,val){
   if(!st.ccbilling)st.ccbilling={cimb:21,bca:17,uob:11};
   st.ccbilling[cc]=day;save();showT('✅ Tanggal tagihan disimpan!');
 }
+function rCCSettings(){
+  const cards=getCCards();
+  document.getElementById('set-cc').innerHTML=cards.map((c,i)=>`
+    <div class="cat-item">
+      <div class="cat-ico-lbl">💳</div>
+      <div class="cat-name-lbl" style="flex:1">${c.name}</div>
+      <div style="display:flex;align-items:center;gap:5px">
+        <span style="font-size:.75rem;color:#999">tgl</span>
+        <input type="number" value="${c.day}" min="1" max="31" style="width:58px;padding:5px 8px;border:2px solid #e8e8f0;border-radius:8px;font-size:.84rem" onchange="saveCCDay(${i},this.value)">
+      </div>
+      ${i<3?`<span style="font-size:.68rem;color:#bbb;padding:2px 7px;background:#f5f5f5;border-radius:10px">default</span>`:`<button class="cat-act-btn" onclick="delCC(${i})" title="Hapus">🗑</button>`}
+    </div>`).join('');
+}
+function saveCCDay(idx,val){
+  const day=parseInt(val);if(!day||day<1||day>31)return;
+  if(!st.ccards)st.ccards=getCCards();
+  st.ccards[idx].day=day;
+  // keep legacy ccbilling in sync for existing code
+  const key=st.ccards[idx].key;
+  if(key){if(!st.ccbilling)st.ccbilling={};st.ccbilling[key]=day;}
+  save();showT('✅ Tersimpan!');
+}
+function addCC(){
+  const nameEl=document.getElementById('new-cc-name');
+  const dayEl=document.getElementById('new-cc-day');
+  const name=nameEl.value.trim();
+  const day=parseInt(dayEl.value)||1;
+  if(!name){showT('❌ Isi nama kartu kredit!');return}
+  const normalized=name.startsWith('CC ')?name:'CC '+name;
+  if(!st.ccards)st.ccards=getCCards();
+  if(st.ccards.find(c=>c.name===normalized)){showT('⚠️ CC sudah ada!');return}
+  const key=normalized.toLowerCase().replace(/[^a-z0-9]/g,'_');
+  st.ccards.push({key,name:normalized,day});
+  nameEl.value='';dayEl.value='';
+  save();rCCSettings();refreshCatDropdowns();showT('✅ CC '+normalized+' ditambahkan!');
+}
+function delCC(idx){
+  if(!st.ccards)st.ccards=getCCards();
+  if(idx<3){showT('⚠️ Tidak bisa hapus CC default');return}
+  st.ccards.splice(idx,1);
+  save();rCCSettings();refreshCatDropdowns();showT('🗑 CC dihapus');
+}
 
 function refreshRemCatOpts(){
   const type=document.getElementById('rem-type')?.value;
