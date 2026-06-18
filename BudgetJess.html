@@ -1961,15 +1961,20 @@ function openCCMod(payKey,label,billingDay){
         <span style="font-size:.82rem;font-weight:700;color:#92400e">Total tagihan periode ini</span>
         <span style="font-size:1rem;font-weight:900;color:#d97706">${fmtF(total)}</span>
       </div>`
-      +txs.map(t=>`
-      <div class="txi">
-        <div class="txico" style="background:#fef3c7">${anyIco(t.cat||'')}</div>
-        <div class="txinfo">
-          <div class="txd">${t.desc}</div>
-          <div class="txm">${t.date} · ${t.cat||''}</div>
-        </div>
-        <div class="txa">${fmtF(t.amt)}</div>
-      </div>`).join('')
+      +txs.map(t=>{
+        const tsrc=st.pTx.find(x=>x.id===t.id)?'p':'rt';
+        return`<div class="txi">
+          <div class="txico" style="background:#fef3c7">${anyIco(t.cat||'')}</div>
+          <div class="txinfo">
+            <div class="txd">${t.desc}</div>
+            <div class="txm">${t.date} · ${t.cat||''}</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:3px">
+            <div class="txa">${fmtF(t.amt)}</div>
+            <button class="dbtn" title="Edit" onclick="closeCCMod();openEM('${t.id}','${tsrc}')">✏️</button>
+            <button class="dbtn" title="Hapus" onclick="closeCCMod();askD('${t.id}','${tsrc}')">🗑</button>
+          </div>
+        </div>`;}).join('')
     :`<div class="empty"><div class="ei">🎉</div><p>Belum ada transaksi periode ini</p></div>`;
   // Pay section
   renderCCPaySection(payKey,d.stmtStart,total);
