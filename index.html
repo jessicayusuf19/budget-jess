@@ -2105,12 +2105,8 @@ function rSettings(){
   // Payment Methods
   rPayMethods();
 
-  // CC Billing Dates
-  const cc=st.ccbilling||{cimb:21,bca:17,uob:11};
-  document.getElementById('set-cc').innerHTML=`
-    <div class="strow"><label>CC CIMB Niaga</label><div style="display:flex;align-items:center;gap:6px"><span style="font-size:.78rem;color:#999">tgl</span><input type="number" value="${cc.cimb}" min="1" max="31" style="width:70px;padding:7px 10px;border:2px solid #e8e8f0;border-radius:10px;font-size:.86rem" onchange="saveCCBillingDay('cimb',this.value)"></div></div>
-    <div class="strow"><label>CC BCA</label><div style="display:flex;align-items:center;gap:6px"><span style="font-size:.78rem;color:#999">tgl</span><input type="number" value="${cc.bca}" min="1" max="31" style="width:70px;padding:7px 10px;border:2px solid #e8e8f0;border-radius:10px;font-size:.86rem" onchange="saveCCBillingDay('bca',this.value)"></div></div>
-    <div class="strow"><label>CC UOB</label><div style="display:flex;align-items:center;gap:6px"><span style="font-size:.78rem;color:#999">tgl</span><input type="number" value="${cc.uob}" min="1" max="31" style="width:70px;padding:7px 10px;border:2px solid #e8e8f0;border-radius:10px;font-size:.86rem" onchange="saveCCBillingDay('uob',this.value)"></div></div>`;
+  // CC Cards
+  rCCSettings();
 
   // Reminders
   const rems=st.reminders||[];
