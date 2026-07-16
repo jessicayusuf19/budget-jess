@@ -1203,7 +1203,8 @@ function rSync(){
 
 function save(){
   localStorage.setItem('jb_v5',JSON.stringify(st));
-  if(fbConnected&&fbRef){setSyncStatus('syncing');fbRef.set(st).then(()=>setSyncStatus('connected')).catch(e=>{setSyncStatus('error');console.error(e)})}
+  if(fbConnected&&fbRef){setSyncStatus('syncing');fbRef.set(st).then(()=>setSyncStatus('connected')).catch(e=>{setSyncStatus('error');console.error(e)});}
+  else{restPush();setSyncStatus('connected');}
 }
 let st=load();
 
