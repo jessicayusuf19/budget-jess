@@ -1219,18 +1219,31 @@ function forcePullFirebase(){
       showT('✅ Data dari HP berhasil diambil! '+((st.pTx||[]).length+(st.rtTx||[]).length)+' transaksi loaded.');
     },err=>showT('❌ Gagal ambil data: '+err.message));
   };
+  // Already connected — use existing ref
   if(fbRef){doPull(fbRef);return;}
-  const cfg=loadFbConfig();
-  if(!cfg){
-    showT('⚠️ Firebase belum tersambung. Mengarahkan ke tab Sync...');
-    setTimeout(()=>{syncMobNav('sync');showT('👆 Isi config Firebase lalu klik Hubungkan, baru klik Ambil Data dari HP lagi');},1000);
+  // Try saved config
+  let cfg=loadFbConfig();
+  const fpKey=(document.getElementById('fp-key-input')||{}).value||'';
+  if(cfg){
+    // Override syncKey jika user isi manual
+    if(fpKey)cfg.syncKey=fpKey;
+    try{
+      const tmpApp=firebase.initializeApp(cfg,'forcepull_'+Date.now());
+      const tmpRef=firebase.database(tmpApp).ref('budget/'+cfg.syncKey);
+      doPull(tmpRef);
+    }catch(e){showT('❌ Gagal konek Firebase: '+e.message);}
     return;
   }
-  try{
-    const tmpApp=firebase.initializeApp(cfg,'forcepull_'+Date.now());
-    const tmpRef=firebase.database(tmpApp).ref('budget/'+cfg.syncKey);
-    doPull(tmpRef);
-  }catch(e){showT('❌ Gagal konek Firebase: '+e.message);}
+  // No config at all — show key input and ask user
+  const keyRow=document.getElementById('fp-key-row');
+  if(keyRow)keyRow.style.display='';
+  if(!fpKey){
+    showT('⚠️ Isi Sync Key di atas lalu klik tombol lagi');
+    return;
+  }
+  // Have key but no full config — must go to Sync tab once
+  showT('⚠️ Perlu sambungkan Firebase dulu. Buka tab Sync, isi config + key lalu klik Hubungkan.');
+  setTimeout(()=>syncMobNav('sync'),1500);
 }
 function forceResync(){
   if(!confirm('Sinkronkan ulang semua saldo dan transaksi dari biaya rutin? Proses ini akan menghitung ulang dari awal.'))return;
