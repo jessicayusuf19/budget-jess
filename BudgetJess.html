@@ -1116,6 +1116,17 @@ function refreshCatDropdowns(){
 // FIREBASE SYNC
 // ══════════════════════════
 let fbApp=null,fbDb=null,fbRef=null,fbConnected=false;
+const FB_DB='https://budget-jess-default-rtdb.asia-southeast1.firebasedatabase.app';
+const FB_KEY='Jessica1994';
+function fbRestUrl(){const cfg=loadFbConfig();return`${FB_DB}/budget/${(cfg&&cfg.syncKey)||FB_KEY}.json`;}
+function restPush(){fetch(fbRestUrl(),{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(st)}).catch(()=>{});}
+function restPoll(){
+  fetch(fbRestUrl()).then(r=>r.ok?r.json():null).then(data=>{
+    if(!data)return;
+    const rem=JSON.stringify(data),loc=JSON.stringify(st);
+    if(rem!==loc){st={...DEF,...data};if(!st.xi)st.xi={};if(!st.budgets)st.budgets={};if(!st.ccards){const cb=st.ccbilling||{};st.ccards=[{key:'cimb',name:'CC CIMB',day:cb.cimb||21},{key:'bca',name:'CC BCA',day:cb.bca||17},{key:'uob',name:'CC UOB',day:cb.uob||11}];}runMigrations();localStorage.setItem('jb_v5',JSON.stringify(st));rerenderCurrent();setSyncStatus('connected');}
+  }).catch(()=>{});}
+let _restInterval=null;
 
 function loadFbConfig(){try{return JSON.parse(localStorage.getItem('fb_cfg')||'null')}catch{return null}}
 
