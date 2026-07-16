@@ -1197,49 +1197,30 @@ function save(){
 let st=load();
 
 function forcePullFirebase(){
-  const doPull=ref=>{
-    showT('⏳ Mengambil data dari Firebase...');
-    ref.once('value',snap=>{
-      const data=snap.val();
-      if(!data){showT('❌ Tidak ada data di Firebase!');return;}
-      st={...DEF,...data};
-      if(!st.xi)st.xi={};
-      if(!st.budgets)st.budgets={};
-      if(!st.ccards){
-        const cb=st.ccbilling||{cimb:21,bca:17,uob:11};
-        st.ccards=[{key:'cimb',name:'CC CIMB',day:cb.cimb||21},{key:'bca',name:'CC BCA',day:cb.bca||17},{key:'uob',name:'CC UOB',day:cb.uob||11}];
-      }
-      runMigrations();
-      localStorage.setItem('jb_v5',JSON.stringify(st));
-      rOV();rPD();rRTD();rSavBals();
-      showT('✅ Data dari HP berhasil diambil! '+((st.pTx||[]).length+(st.rtTx||[]).length)+' transaksi loaded.');
-    },err=>showT('❌ Gagal ambil data: '+err.message));
-  };
-  // Already connected — use existing ref
-  if(fbRef){doPull(fbRef);return;}
-  // Try saved config
-  let cfg=loadFbConfig();
-  const fpKey=(document.getElementById('fp-key-input')||{}).value||'';
-  if(cfg){
-    // Override syncKey jika user isi manual
-    if(fpKey)cfg.syncKey=fpKey;
-    try{
-      const tmpApp=firebase.initializeApp(cfg,'forcepull_'+Date.now());
-      const tmpRef=firebase.database(tmpApp).ref('budget/'+cfg.syncKey);
-      doPull(tmpRef);
-    }catch(e){showT('❌ Gagal konek Firebase: '+e.message);}
-    return;
-  }
-  // No config at all — show key input and ask user
-  const keyRow=document.getElementById('fp-key-row');
-  if(keyRow)keyRow.style.display='';
-  if(!fpKey){
-    showT('⚠️ Isi Sync Key di atas lalu klik tombol lagi');
-    return;
-  }
-  // Have key but no full config — must go to Sync tab once
-  showT('⚠️ Perlu sambungkan Firebase dulu. Buka tab Sync, isi config + key lalu klik Hubungkan.');
-  setTimeout(()=>syncMobNav('sync'),1500);
+  // Use REST API — no Firebase SDK config needed
+  const DB_URL='https://budget-jess-default-rtdb.asia-southeast1.firebasedatabase.app';
+  const syncKey=(()=>{const cfg=loadFbConfig();return(cfg&&cfg.syncKey)||'Jessica1994';})();
+  const url=`${DB_URL}/budget/${syncKey}.json`;
+  showT('⏳ Mengambil data dari Firebase...');
+  fetch(url).then(r=>{
+    if(!r.ok)throw new Error('HTTP '+r.status);
+    return r.json();
+  }).then(data=>{
+    if(!data){showT('❌ Tidak ada data di Firebase!');return;}
+    st={...DEF,...data};
+    if(!st.xi)st.xi={};
+    if(!st.budgets)st.budgets={};
+    if(!st.ccards){
+      const cb=st.ccbilling||{cimb:21,bca:17,uob:11};
+      st.ccards=[{key:'cimb',name:'CC CIMB',day:cb.cimb||21},{key:'bca',name:'CC BCA',day:cb.bca||17},{key:'uob',name:'CC UOB',day:cb.uob||11}];
+    }
+    runMigrations();
+    localStorage.setItem('jb_v5',JSON.stringify(st));
+    // Also reconnect Firebase SDK if config exists
+    const cfg=loadFbConfig();if(cfg&&!fbRef)initFirebase(cfg);
+    rOV();rPD();rRTD();rSavBals();
+    showT('✅ Data dari HP berhasil diambil! '+((st.pTx||[]).length+(st.rtTx||[]).length)+' transaksi loaded.');
+  }).catch(e=>showT('❌ Gagal ambil data: '+e.message));
 }
 function forceResync(){
   if(!confirm('Sinkronkan ulang semua saldo dan transaksi dari biaya rutin? Proses ini akan menghitung ulang dari awal.'))return;
