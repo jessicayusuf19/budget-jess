@@ -1217,7 +1217,11 @@ function forcePullFirebase(){
   };
   if(fbRef){doPull(fbRef);return;}
   const cfg=loadFbConfig();
-  if(!cfg){showT('❌ Firebase belum dikonfigurasi. Buka tab Sync dan sambungkan dulu.');return;}
+  if(!cfg){
+    showT('⚠️ Firebase belum tersambung. Mengarahkan ke tab Sync...');
+    setTimeout(()=>{syncMobNav('sync');showT('👆 Isi config Firebase lalu klik Hubungkan, baru klik Ambil Data dari HP lagi');},1000);
+    return;
+  }
   try{
     const tmpApp=firebase.initializeApp(cfg,'forcepull_'+Date.now());
     const tmpRef=firebase.database(tmpApp).ref('budget/'+cfg.syncKey);
