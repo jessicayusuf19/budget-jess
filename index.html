@@ -1197,23 +1197,32 @@ function save(){
 let st=load();
 
 function forcePullFirebase(){
-  if(!fbConnected||!fbRef){showT('❌ Firebase belum terhubung! Buka tab Sync dulu.');return;}
-  showT('⏳ Mengambil data dari Firebase...');
-  fbRef.once('value',snap=>{
-    const data=snap.val();
-    if(!data){showT('❌ Tidak ada data di Firebase!');return;}
-    st={...DEF,...data};
-    if(!st.xi)st.xi={};
-    if(!st.budgets)st.budgets={};
-    if(!st.ccards){
-      const cb=st.ccbilling||{cimb:21,bca:17,uob:11};
-      st.ccards=[{key:'cimb',name:'CC CIMB',day:cb.cimb||21},{key:'bca',name:'CC BCA',day:cb.bca||17},{key:'uob',name:'CC UOB',day:cb.uob||11}];
-    }
-    runMigrations();
-    localStorage.setItem('jb_v5',JSON.stringify(st));
-    rOV();rPD();rRTD();rSavBals();
-    showT('✅ Data dari HP berhasil diambil! '+((st.pTx||[]).length+(st.rtTx||[]).length)+' transaksi loaded.');
-  },err=>showT('❌ Gagal ambil data: '+err.message));
+  const doPull=ref=>{
+    showT('⏳ Mengambil data dari Firebase...');
+    ref.once('value',snap=>{
+      const data=snap.val();
+      if(!data){showT('❌ Tidak ada data di Firebase!');return;}
+      st={...DEF,...data};
+      if(!st.xi)st.xi={};
+      if(!st.budgets)st.budgets={};
+      if(!st.ccards){
+        const cb=st.ccbilling||{cimb:21,bca:17,uob:11};
+        st.ccards=[{key:'cimb',name:'CC CIMB',day:cb.cimb||21},{key:'bca',name:'CC BCA',day:cb.bca||17},{key:'uob',name:'CC UOB',day:cb.uob||11}];
+      }
+      runMigrations();
+      localStorage.setItem('jb_v5',JSON.stringify(st));
+      rOV();rPD();rRTD();rSavBals();
+      showT('✅ Data dari HP berhasil diambil! '+((st.pTx||[]).length+(st.rtTx||[]).length)+' transaksi loaded.');
+    },err=>showT('❌ Gagal ambil data: '+err.message));
+  };
+  if(fbRef){doPull(fbRef);return;}
+  const cfg=loadFbConfig();
+  if(!cfg){showT('❌ Firebase belum dikonfigurasi. Buka tab Sync dan sambungkan dulu.');return;}
+  try{
+    const tmpApp=firebase.initializeApp(cfg,'forcepull_'+Date.now());
+    const tmpRef=firebase.database(tmpApp).ref('budget/'+cfg.syncKey);
+    doPull(tmpRef);
+  }catch(e){showT('❌ Gagal konek Firebase: '+e.message);}
 }
 function forceResync(){
   if(!confirm('Sinkronkan ulang semua saldo dan transaksi dari biaya rutin? Proses ini akan menghitung ulang dari awal.'))return;
