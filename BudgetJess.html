@@ -2598,6 +2598,10 @@ function rCCProjection(){
     if(capEnd<start)return 0;
     return allTx.filter(t=>t.pay===cardName&&(t.type==='expense'||!t.type)&&t.date>=start&&t.date<=capEnd).reduce((s,t)=>s+t.amt,0);
   }
+  // Future scheduled transactions (e.g. cicilan installments already in data)
+  function ccScheduledFuture(cardName,start,end){
+    return allTx.filter(t=>t.pay===cardName&&(t.type==='expense'||!t.type)&&t.date>todayStr&&t.date>=start&&t.date<=end).reduce((s,t)=>s+t.amt,0);
+  }
 
   // For a given card, the billing period whose PAYMENT is due in dueYM.
   // offset=-1 when todayDay>=billingDay (pay next month after cycle closes),
