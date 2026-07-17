@@ -2294,32 +2294,51 @@ function unPayCC(payKey,stmtStart,total){
 function closeCCMod(){document.getElementById('ccmod').classList.remove('open')}
 function openCCProjDetail(cardName,label,periodStart,periodEnd,dueYM){
   const todayStr=new Date().toISOString().split('T')[0];
-  const capEnd=periodEnd>todayStr?todayStr:periodEnd;
-  const txs=[...st.pTx,...st.rtTx]
-    .filter(t=>t.pay===cardName&&(t.type==='expense'||!t.type)&&t.date>=periodStart&&t.date<=capEnd)
-    .sort((a,b)=>b.date.localeCompare(a.date));
-  const total=txs.reduce((s,t)=>s+t.amt,0);
   const isFuture=periodStart>todayStr;
+  const capEnd=periodEnd>todayStr?todayStr:periodEnd;
+  const allTxArr=[...st.pTx,...st.rtTx];
+  function txRow(t,bg){
+    const tsrc=st.pTx.find(x=>x.id===t.id)?'p':'rt';
+    return`<div class="txi"><div class="txico" style="background:${bg}">${anyIco(t.cat||'')}</div>
+      <div class="txinfo"><div class="txd">${t.desc}</div><div class="txm">${t.date} · ${t.cat||''}</div></div>
+      <div style="display:flex;align-items:center;gap:3px"><div class="txa">${fmtF(t.amt)}</div>
+      <button class="dbtn" title="Edit" onclick="closeCCMod();openEM('${t.id}','${tsrc}')">✏️</button></div></div>`;
+  }
   document.getElementById('cc-mod-title').textContent=label+' — Due '+mN(dueYM);
-  document.getElementById('cc-mod-sub').textContent=`Periode: ${periodStart} s/d ${capEnd}${isFuture?' (proyeksi)':''}`;
-  document.getElementById('cc-mod-txs').innerHTML=txs.length
-    ?`<div style="background:#fef3c7;border-radius:10px;padding:10px 14px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center">
+  document.getElementById('cc-mod-sub').textContent=`Periode: ${periodStart} s/d ${periodEnd}${isFuture?' (proyeksi)':''}`;
+  let inner='';
+  if(isFuture){
+    const futTxs=allTxArr.filter(t=>t.pay===cardName&&(t.type==='expense'||!t.type)&&t.date>todayStr&&t.date>=periodStart&&t.date<=periodEnd).sort((a,b)=>b.date.localeCompare(a.date));
+    const futTotal=futTxs.reduce((s,t)=>s+t.amt,0);
+    if(futTxs.length){
+      inner+=`<div style="font-size:.72rem;font-weight:800;color:#6c63ff;padding:4px 0 6px;letter-spacing:.03em">🔄 CICILAN TERJADWAL</div>`;
+      inner+=`<div style="background:#f5f4ff;border-radius:10px;padding:8px 14px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center">
+        <span style="font-size:.82rem;font-weight:700;color:#6c63ff">Total cicilan terjadwal</span>
+        <span style="font-size:1rem;font-weight:900;color:#6c63ff">${fmtF(futTotal)}</span></div>`;
+      inner+=futTxs.map(t=>txRow(t,'#f5f4ff')).join('');
+    } else {
+      inner+=`<div class="empty"><div class="ei">🔄</div><p>Belum ada cicilan terjadwal di periode ini</p></div>`;
+    }
+    inner+=`<div style="background:#fef9c3;border-radius:10px;padding:10px 14px;margin-top:10px;font-size:.8rem;color:#92400e;line-height:1.5">
+      📊 Periode belum dimulai (${periodStart}). Estimasi total CC di proyeksi berdasarkan rata-rata historis + cicilan terjadwal di atas.</div>`;
+  } else {
+    const txs=allTxArr.filter(t=>t.pay===cardName&&(t.type==='expense'||!t.type)&&t.date>=periodStart&&t.date<=capEnd).sort((a,b)=>b.date.localeCompare(a.date));
+    const futureTxs=allTxArr.filter(t=>t.pay===cardName&&(t.type==='expense'||!t.type)&&t.date>todayStr&&t.date>=periodStart&&t.date<=periodEnd).sort((a,b)=>b.date.localeCompare(a.date));
+    const total=txs.reduce((s,t)=>s+t.amt,0)+futureTxs.reduce((s,t)=>s+t.amt,0);
+    if(txs.length||futureTxs.length){
+      inner+=`<div style="background:#fef3c7;border-radius:10px;padding:10px 14px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center">
         <span style="font-size:.82rem;font-weight:700;color:#92400e">Total tagihan periode ini</span>
-        <span style="font-size:1rem;font-weight:900;color:#d97706">${fmtF(total)}</span>
-      </div>`
-      +txs.map(t=>{
-        const tsrc=st.pTx.find(x=>x.id===t.id)?'p':'rt';
-        return`<div class="txi">
-          <div class="txico" style="background:#fef3c7">${anyIco(t.cat||'')}</div>
-          <div class="txinfo"><div class="txd">${t.desc}</div><div class="txm">${t.date} · ${t.cat||''}</div></div>
-          <div style="display:flex;align-items:center;gap:3px">
-            <div class="txa">${fmtF(t.amt)}</div>
-            <button class="dbtn" title="Edit" onclick="closeCCMod();openEM('${t.id}','${tsrc}')">✏️</button>
-          </div>
-        </div>`;}).join('')
-    :isFuture
-      ?`<div class="empty"><div class="ei">📅</div><p>Periode belum dimulai — angka proyeksi berdasarkan rata-rata historis</p></div>`
-      :`<div class="empty"><div class="ei">🎉</div><p>Belum ada transaksi di periode ini</p></div>`;
+        <span style="font-size:1rem;font-weight:900;color:#d97706">${fmtF(total)}</span></div>`;
+      inner+=txs.map(t=>txRow(t,'#fef3c7')).join('');
+      if(futureTxs.length){
+        inner+=`<div style="font-size:.72rem;font-weight:800;color:#6c63ff;padding:10px 0 6px;letter-spacing:.03em">🔄 CICILAN TERJADWAL (belum jatuh tempo)</div>`;
+        inner+=futureTxs.map(t=>txRow(t,'#f5f4ff')).join('');
+      }
+    } else {
+      inner=`<div class="empty"><div class="ei">🎉</div><p>Belum ada transaksi di periode ini</p></div>`;
+    }
+  }
+  document.getElementById('cc-mod-txs').innerHTML=inner;
   document.getElementById('cc-mod-pay-section').innerHTML='';
   document.getElementById('ccmod').classList.add('open');
 }
