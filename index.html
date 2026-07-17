@@ -1251,6 +1251,8 @@ function autoBackup(){
 function save(){
   localStorage.setItem('jb_v5',JSON.stringify(st));
   autoBackup();
+  // Guard: never push to Firebase if local has fewer transactions than Firebase max seen
+  if(localTxCount()<fbMaxTxCount){console.warn('save() push blocked: local('+localTxCount()+') < fbMax('+fbMaxTxCount+')');return;}
   if(fbConnected&&fbRef){setSyncStatus('syncing');fbRef.set(st).then(()=>setSyncStatus('connected')).catch(e=>{setSyncStatus('error');restPush();setSyncStatus('connected');});}
   else{restPush();setSyncStatus('connected');}
 }
