@@ -1558,6 +1558,9 @@ function rOV(){
     return`<tr><td><b>${mN(m)}</b></td><td style="color:#22c55e;font-weight:700">${fmt(p.inc)}</td><td>${fmt(p.total)}</td><td>${fmt(rt.total)}</td><td><b>${fmt(p.total+rt.total)}</b></td><td style="color:${ok?'#16a34a':'#dc2626'};font-weight:800">${ok?'+':''}${fmt(net)}</td><td><span class="pill ${ok?'ok':'over'}">${ok?'SURPLUS':'DEFISIT'}</span></td></tr>`;
   }).join('');
   rCCBilling();
+  rCCProjection();
+  rIncomeRate();
+  r5030();
   rOvReminders();
   checkBudgetAlerts();
 }
