@@ -2849,6 +2849,32 @@ function exportAllCSV(){
 function exportPDF(){
   window.print();
 }
+function backupJSON(){
+  const blob=new Blob([JSON.stringify(st,null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download=`BudgetJess_backup_${new Date().toISOString().slice(0,10)}.json`;a.click();
+  showT('✅ Backup berhasil didownload!');
+}
+function restoreJSON(){
+  document.getElementById('restore-file-input').click();
+}
+function doRestoreJSON(input){
+  const file=input.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    try{
+      const parsed=JSON.parse(e.target.result);
+      if(!parsed.pTx)throw new Error('Format tidak valid');
+      st={...DEF,...parsed};
+      localStorage.setItem('jb_v5',JSON.stringify(st));
+      restPush();
+      rerenderCurrent();
+      showT('✅ Data berhasil di-restore!');
+    }catch(err){showT('❌ File tidak valid: '+err.message);}
+  };
+  reader.readAsText(file);
+  input.value='';
+}
 
 // ══════════════════════════
 // LAPORAN TREND CHART
