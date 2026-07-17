@@ -2568,28 +2568,13 @@ function openInstallmentMgr(){
       </div>
       <button onclick="delInstall(${i})" style="border:none;background:#fee2e2;color:#ef4444;border-radius:7px;padding:4px 10px;font-size:.75rem;cursor:pointer">Hapus</button>
     </div>`).join(''):'<div style="color:#aaa;font-size:.8rem;padding:8px 0">Belum ada cicilan.</div>';
-  openModal('modal-installment',`
-    <div style="background:#fff;border-radius:18px;padding:22px;max-width:420px;width:90%;max-height:90vh;overflow-y:auto">
-      <h3 style="margin:0 0 14px">🔄 Kelola Cicilan / Installment</h3>
-      <div id="inst-list">${listHtml}</div>
-      <div style="margin-top:16px;background:#f5f4ff;border-radius:12px;padding:14px">
-        <b style="font-size:.82rem">Tambah Cicilan Baru</b>
-        <div class="fld" style="margin-top:10px"><label>Nama</label><input id="inst-name" placeholder="Cicilan Laptop, Cicilan HP..." style="width:100%;padding:7px;border:1px solid #ddd;border-radius:8px"></div>
-        <div class="fld"><label>Kartu</label>
-          <select id="inst-card" style="width:100%;padding:7px;border:1px solid #ddd;border-radius:8px">
-            ${cards.map(c=>`<option value="${c.name}">${c.name}</option>`).join('')}
-          </select>
-        </div>
-        <div class="frow">
-          <div class="fld"><label>Cicilan/Bulan (Rp)</label><input id="inst-monthly" type="number" placeholder="500000" inputmode="numeric" style="width:100%;padding:7px;border:1px solid #ddd;border-radius:8px"></div>
-          <div class="fld"><label>Total Bulan</label><input id="inst-total" type="number" value="12" min="2" max="60" style="width:100%;padding:7px;border:1px solid #ddd;border-radius:8px"></div>
-        </div>
-        <div class="fld"><label>Mulai Bulan (YYYY-MM)</label><input id="inst-start" type="month" style="width:100%;padding:7px;border:1px solid #ddd;border-radius:8px"></div>
-        <button onclick="addInstall()" style="width:100%;margin-top:10px;border:none;background:#6c63ff;color:#fff;border-radius:10px;padding:10px;font-weight:700;font-size:.85rem;cursor:pointer">+ Tambah Cicilan</button>
-      </div>
-      <button onclick="closeModal('modal-installment')" style="width:100%;margin-top:12px;border:1px solid #ddd;background:#fff;border-radius:10px;padding:9px;cursor:pointer;font-size:.85rem">Tutup</button>
-    </div>`);
+  document.getElementById('inst-list').innerHTML=listHtml;
+  document.getElementById('inst-card').innerHTML=cards.map(c=>`<option value="${c.name}">${c.name}</option>`).join('');
+  document.getElementById('inst-name').value='';
+  document.getElementById('inst-monthly').value='';
+  document.getElementById('inst-total').value='12';
   document.getElementById('inst-start').value=nowM();
+  document.getElementById('inst-modal').classList.add('open');
 }
 function addInstall(){
   const name=document.getElementById('inst-name').value.trim();
