@@ -1940,6 +1940,26 @@ function saveEdit(){
   const newPay=t.type==='expense'?document.getElementById('e-pay').value:t.pay;
   // reverse old balance effect, apply new
   if(t.type==='expense'){reverseAcc(t.pay,t.amt,t);deductAcc(newPay,amt,t);}
+  // Check if converting to cicilan
+  const isCicilan=document.getElementById('e-is-cicilan')?.checked&&t.type==='expense'&&newPay.startsWith('CC');
+  if(isCicilan){
+    const n=parseInt(document.getElementById('e-cicilan-n').value)||3;
+    const cat=document.getElementById('e-cat').value;
+    const desc=document.getElementById('e-desc').value.trim();
+    const date=document.getElementById('e-date').value;
+    // Remove original tx
+    if(eSrc==='p')st.pTx=st.pTx.filter(x=>x.id!==eId);
+    else st.rtTx=st.rtTx.filter(x=>x.id!==eId);
+    // Create N monthly transactions
+    const base={id:eId,date,desc,amt,type:'expense',cat,pay:newPay,_imported:true};
+    const txArr=eSrc==='p'?st.pTx:st.rtTx;
+    addCicilanTx(txArr,base,n);
+    save();closeEM();
+    if(eSrc==='p')rPD();else rRTD();
+    rCCProjection();
+    showT(`✅ Dijadikan ${n} cicilan!`);
+    return;
+  }
   t.date=document.getElementById('e-date').value;
   t.desc=document.getElementById('e-desc').value.trim();
   t.amt=amt;
