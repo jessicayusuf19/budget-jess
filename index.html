@@ -1886,6 +1886,25 @@ function openEM(id,src){
   document.getElementById('emod').classList.add('open');
 }
 function closeEM(){document.getElementById('emod').classList.remove('open');eId=eSrc=null}
+function checkECicilanShow(){
+  const pay=document.getElementById('e-pay').value;
+  const isCC=pay&&pay.startsWith('CC');
+  const wrap=document.getElementById('e-cicilan-wrap');
+  if(wrap)wrap.style.display=isCC?'':'none';
+  if(!isCC){const cb=document.getElementById('e-is-cicilan');if(cb)cb.checked=false;document.getElementById('e-cicilan-opts').style.display='none';}
+}
+function toggleECicilan(){
+  const on=document.getElementById('e-is-cicilan').checked;
+  document.getElementById('e-cicilan-opts').style.display=on?'':'none';
+  if(on)updateECicilanInfo();
+}
+function updateECicilanInfo(){
+  const amt=parseFloat(document.getElementById('e-amt').value)||0;
+  const n=parseInt(document.getElementById('e-cicilan-n').value)||3;
+  const monthly=amt>0?Math.round(amt/n):0;
+  const info=document.getElementById('e-cicilan-info');
+  if(info)info.textContent=monthly>0?`= ${fmtF(monthly)} / bulan selama ${n} bulan`:'';
+}
 function moveTxFromEdit(){
   if(!eId)return;
   if(eSrc==='p'){
