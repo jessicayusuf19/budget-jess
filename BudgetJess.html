@@ -2459,6 +2459,288 @@ function rCCBilling(){
 }
 
 // ══════════════════════════
+// CC PROJECTION 6 MONTHS
+// ══════════════════════════
+function addMonths(ym,n){
+  const [y,m]=ym.split('-').map(Number);
+  const d=new Date(y,m-1+n,1);
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
+}
+function ymDiff(ymA,ymB){
+  const [ay,am]=ymA.split('-').map(Number);
+  const [by,bm]=ymB.split('-').map(Number);
+  return (ay-by)*12+(am-bm);
+}
+function rCCProjection(){
+  const el=document.getElementById('ov-cc-proj');if(!el)return;
+  const cards=getCCards();
+  const curM=nowM();
+  const months=[curM,addMonths(curM,1),addMonths(curM,2),addMonths(curM,3),addMonths(curM,4),addMonths(curM,5)];
+  const allTx=[...(st.pTx||[]),...(st.rtTx||[])];
+  // Build installment info per card per month from st.installments
+  const installs=st.installments||[];
+  // Compute spending per CC per ym from actual transactions
+  function ccSpendForMonth(cardName,ym){
+    const [y,m]=ym.split('-').map(Number);
+    const start=new Date(y,m-1,1).toISOString().split('T')[0];
+    const end=new Date(y,m,0).toISOString().split('T')[0];
+    return allTx.filter(t=>t.pay===cardName&&t.type==='expense'&&t.date>=start&&t.date<=end).reduce((s,t)=>s+t.amt,0);
+  }
+  function installAmt(cardName,ym){
+    return installs.filter(inst=>{
+      if(inst.card!==cardName)return false;
+      const offset=ymDiff(ym,inst.startYM);
+      return offset>=0&&offset<inst.totalMonths;
+    }).reduce((s,inst)=>s+inst.monthlyAmt,0);
+  }
+  // Table
+  let html=`<div style="overflow-x:auto"><table style="width:100%;font-size:.8rem;border-collapse:collapse">
+    <thead><tr style="background:#f5f4ff">
+      <th style="padding:8px 10px;text-align:left;border-radius:8px 0 0 0">Bulan</th>
+      ${cards.map(c=>`<th style="padding:8px 10px;text-align:right">${c.name}</th>`).join('')}
+      <th style="padding:8px 10px;text-align:right;border-radius:0 8px 0 0">Total</th>
+    </tr></thead><tbody>`;
+  months.forEach((ym,idx)=>{
+    const isCur=idx===0;
+    const label=mN(ym);
+    const vals=cards.map(c=>{
+      const actual=ccSpendForMonth(c.name,ym);
+      const inst=installAmt(c.name,ym);
+      // For future months: use avg of last 3 months as base + installments
+      if(idx===0){return{actual,inst,proj:actual+inst};}
+      const last3=[addMonths(ym,-1),addMonths(ym,-2),addMonths(ym,-3)];
+      const avg=last3.reduce((s,m)=>s+ccSpendForMonth(c.name,m),0)/3;
+      return{actual,inst,proj:Math.round(avg)+inst};
+    });
+    const total=vals.reduce((s,v)=>s+v.proj,0);
+    html+=`<tr style="border-bottom:1px solid #f0f0fa${isCur?';background:#fafafa':''}">
+      <td style="padding:8px 10px;font-weight:${isCur?800:500};color:${isCur?'#6c63ff':'inherit'}">${label}${isCur?' <span style="font-size:.68rem;color:#6c63ff">(aktif)</span>':''}</td>
+      ${vals.map((v,i)=>{
+        const hasInst=v.inst>0;
+        return`<td style="padding:8px 10px;text-align:right;color:${v.proj>0?cards[i].color||'#333':'#aaa'}">
+          <div style="font-weight:700">${v.proj>0?fmtF(v.proj):'—'}</div>
+          ${hasInst?`<div style="font-size:.65rem;color:#6c63ff">+${fmtF(v.inst)} cicilan</div>`:''}
+        </td>`;
+      }).join('')}
+      <td style="padding:8px 10px;text-align:right;font-weight:800;color:${total>5e6?'#ef4444':total>2e6?'#f59e0b':'#22c55e'}">${total>0?fmtF(total):'—'}</td>
+    </tr>`;
+  });
+  html+=`</tbody></table></div>`;
+  if(installs.length){
+    html+=`<div style="margin-top:12px;font-size:.75rem;color:#777"><b>Cicilan aktif:</b> ${installs.map(i=>`${i.name} (${i.card}, ${fmtF(i.monthlyAmt)}/bln, ${i.totalMonths} bln dari ${mN(i.startYM)})`).join(' · ')}</div>`;
+  } else {
+    html+=`<div style="margin-top:10px;font-size:.75rem;color:#aaa">Belum ada cicilan. Tap <b>+ Cicilan</b> untuk tambah.</div>`;
+  }
+  el.innerHTML=html;
+}
+
+// ══════════════════════════
+// INSTALLMENT MANAGER MODAL
+// ══════════════════════════
+function openInstallmentMgr(){
+  const installs=st.installments||[];
+  const cards=getCCards();
+  const listHtml=installs.length?installs.map((inst,i)=>`
+    <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #f0f0fa">
+      <div style="flex:1">
+        <div style="font-size:.85rem;font-weight:700">${inst.name}</div>
+        <div style="font-size:.72rem;color:#888">${inst.card} · ${fmtF(inst.monthlyAmt)}/bln · ${inst.totalMonths} bln mulai ${mN(inst.startYM)}</div>
+      </div>
+      <button onclick="delInstall(${i})" style="border:none;background:#fee2e2;color:#ef4444;border-radius:7px;padding:4px 10px;font-size:.75rem;cursor:pointer">Hapus</button>
+    </div>`).join(''):'<div style="color:#aaa;font-size:.8rem;padding:8px 0">Belum ada cicilan.</div>';
+  openModal('modal-installment',`
+    <div style="background:#fff;border-radius:18px;padding:22px;max-width:420px;width:90%;max-height:90vh;overflow-y:auto">
+      <h3 style="margin:0 0 14px">🔄 Kelola Cicilan / Installment</h3>
+      <div id="inst-list">${listHtml}</div>
+      <div style="margin-top:16px;background:#f5f4ff;border-radius:12px;padding:14px">
+        <b style="font-size:.82rem">Tambah Cicilan Baru</b>
+        <div class="fld" style="margin-top:10px"><label>Nama</label><input id="inst-name" placeholder="Cicilan Laptop, Cicilan HP..." style="width:100%;padding:7px;border:1px solid #ddd;border-radius:8px"></div>
+        <div class="fld"><label>Kartu</label>
+          <select id="inst-card" style="width:100%;padding:7px;border:1px solid #ddd;border-radius:8px">
+            ${cards.map(c=>`<option value="${c.name}">${c.name}</option>`).join('')}
+          </select>
+        </div>
+        <div class="frow">
+          <div class="fld"><label>Cicilan/Bulan (Rp)</label><input id="inst-monthly" type="number" placeholder="500000" inputmode="numeric" style="width:100%;padding:7px;border:1px solid #ddd;border-radius:8px"></div>
+          <div class="fld"><label>Total Bulan</label><input id="inst-total" type="number" value="12" min="2" max="60" style="width:100%;padding:7px;border:1px solid #ddd;border-radius:8px"></div>
+        </div>
+        <div class="fld"><label>Mulai Bulan (YYYY-MM)</label><input id="inst-start" type="month" style="width:100%;padding:7px;border:1px solid #ddd;border-radius:8px"></div>
+        <button onclick="addInstall()" style="width:100%;margin-top:10px;border:none;background:#6c63ff;color:#fff;border-radius:10px;padding:10px;font-weight:700;font-size:.85rem;cursor:pointer">+ Tambah Cicilan</button>
+      </div>
+      <button onclick="closeModal('modal-installment')" style="width:100%;margin-top:12px;border:1px solid #ddd;background:#fff;border-radius:10px;padding:9px;cursor:pointer;font-size:.85rem">Tutup</button>
+    </div>`);
+  document.getElementById('inst-start').value=nowM();
+}
+function addInstall(){
+  const name=document.getElementById('inst-name').value.trim();
+  const card=document.getElementById('inst-card').value;
+  const monthly=parseFloat(document.getElementById('inst-monthly').value)||0;
+  const total=parseInt(document.getElementById('inst-total').value)||12;
+  const start=document.getElementById('inst-start').value;
+  if(!name||!monthly||!start){showT('⚠️ Isi semua field');return;}
+  if(!st.installments)st.installments=[];
+  st.installments.push({id:'inst_'+Date.now(),name,card,monthlyAmt:monthly,totalMonths:total,startYM:start});
+  save();
+  closeModal('modal-installment');
+  openInstallmentMgr();
+  rCCProjection();
+  showT('✅ Cicilan ditambah!');
+}
+function delInstall(i){
+  if(!confirm('Hapus cicilan ini?'))return;
+  st.installments.splice(i,1);
+  save();
+  closeModal('modal-installment');
+  openInstallmentMgr();
+  rCCProjection();
+  showT('🗑️ Cicilan dihapus');
+}
+
+// ══════════════════════════
+// INCOME DASHBOARD
+// ══════════════════════════
+function rIncomeRate(){
+  const el=document.getElementById('ov-income');if(!el)return;
+  const m=nowM();
+  const ms=allM();
+  // Income this month
+  const curInc=pMD(m).inc;
+  const curExp=pMD(m).total+(rtMD(m).total||0);
+  const curSav=curInc-curExp;
+  const savRate=curInc>0?Math.round(curSav/curInc*100):0;
+  // Income sources this month
+  const incTx=(st.pTx||[]).filter(t=>t.type==='income'&&t.date&&t.date.startsWith(m));
+  const bySource={};
+  incTx.forEach(t=>{const k=t.cat||'Lainnya';bySource[k]=(bySource[k]||0)+t.amt;});
+  const sources=Object.entries(bySource).sort((a,b)=>b[1]-a[1]);
+  // Last 6 months savings rate
+  const last6=ms.slice(-6);
+  const rateHistory=last6.map(mo=>{
+    const p=pMD(mo),rt=rtMD(mo);
+    const inc=p.inc,exp=p.total+rt.total;
+    return{mo,rate:inc>0?Math.round((inc-exp)/inc*100):0,inc,exp};
+  });
+  const srColor=savRate>=20?'#22c55e':savRate>=10?'#f59e0b':'#ef4444';
+  const srEmoji=savRate>=20?'🟢':savRate>=10?'🟡':'🔴';
+  let html=`<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:16px">
+    <div style="background:#f0fdf4;border-radius:12px;padding:12px 14px;text-align:center">
+      <div style="font-size:.72rem;color:#666;margin-bottom:4px">Income Bulan Ini</div>
+      <div style="font-size:1.05rem;font-weight:900;color:#16a34a">${fmtF(curInc)}</div>
+    </div>
+    <div style="background:#fff8f0;border-radius:12px;padding:12px 14px;text-align:center">
+      <div style="font-size:.72rem;color:#666;margin-bottom:4px">Total Keluar</div>
+      <div style="font-size:1.05rem;font-weight:900;color:#ea580c">${fmtF(curExp)}</div>
+    </div>
+    <div style="background:${savRate>=20?'#f0fdf4':savRate>=10?'#fefce8':'#fff1f2'};border-radius:12px;padding:12px 14px;text-align:center">
+      <div style="font-size:.72rem;color:#666;margin-bottom:4px">Savings Rate ${srEmoji}</div>
+      <div style="font-size:1.05rem;font-weight:900;color:${srColor}">${savRate}%</div>
+      <div style="font-size:.65rem;color:#888">Target ≥ 20%</div>
+    </div>
+  </div>`;
+  if(sources.length){
+    html+=`<div style="margin-bottom:14px"><b style="font-size:.8rem">Sumber Income Bulan Ini</b><div style="margin-top:8px">`;
+    sources.forEach(([k,v])=>{
+      const pct=curInc>0?Math.round(v/curInc*100):0;
+      html+=`<div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+        <div style="font-size:.8rem;width:120px;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${k}</div>
+        <div style="flex:1;background:#f0f0fa;border-radius:99px;height:8px">
+          <div style="background:#6c63ff;border-radius:99px;height:8px;width:${pct}%"></div>
+        </div>
+        <div style="font-size:.75rem;font-weight:700;min-width:70px;text-align:right">${fmtF(v)} <span style="color:#aaa">(${pct}%)</span></div>
+      </div>`;
+    });
+    html+=`</div></div>`;
+  } else {
+    html+=`<div style="font-size:.8rem;color:#aaa;margin-bottom:14px">Belum ada transaksi income bulan ini. Catat income di tab Pribadi dengan tipe Income.</div>`;
+  }
+  // Savings rate trend
+  if(rateHistory.length>1){
+    html+=`<div><b style="font-size:.8rem">Savings Rate — 6 Bulan Terakhir</b><div style="display:flex;align-items:flex-end;gap:8px;margin-top:10px;height:70px">`;
+    const maxR=Math.max(...rateHistory.map(r=>Math.abs(r.rate)),1);
+    rateHistory.forEach(({mo,rate})=>{
+      const h=Math.max(Math.abs(rate)/maxR*60,4);
+      const col=rate>=20?'#22c55e':rate>=10?'#f59e0b':rate>=0?'#ef4444':'#dc2626';
+      html+=`<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px">
+        <div style="font-size:.65rem;font-weight:700;color:${col}">${rate}%</div>
+        <div style="width:100%;background:${col}33;border-radius:4px 4px 0 0;height:${h}px;position:relative">
+          <div style="position:absolute;bottom:0;left:0;right:0;background:${col};border-radius:4px 4px 0 0;height:${h}px"></div>
+        </div>
+        <div style="font-size:.6rem;color:#999">${mN(mo).substring(0,3)}</div>
+      </div>`;
+    });
+    html+=`</div></div>`;
+  }
+  el.innerHTML=html;
+}
+
+// ══════════════════════════
+// 50/30/20 TRACKER
+// ══════════════════════════
+const NEEDS_CATS=['Home','Transport','Health','Daily Living','Monthly Fixed','Baby/Maxon','Belanja Dapur','Makan Sehari-hari','Listrik/Air/Gas','Internet/TV','ART/Suster','Keperluan Rumah','Transport RT','Anak/Sekolah'];
+const WANTS_CATS=['Entertainment','Shopping','Charity/Gift','Tak Terduga','Bisnis','Tak Terduga RT'];
+function r5030(){
+  const el=document.getElementById('ov-5030');const mEl=document.getElementById('ov-5030-month');if(!el)return;
+  const m=nowM();
+  if(mEl)mEl.textContent=mN(m);
+  const p=pMD(m),rt=rtMD(m);
+  const inc=p.inc;
+  const allCats={...p.cats};
+  Object.entries(rt.cats).forEach(([k,v])=>{allCats[k]=(allCats[k]||0)+v;});
+  let needs=0,wants=0;
+  Object.entries(allCats).forEach(([k,v])=>{
+    if(NEEDS_CATS.includes(k))needs+=v;
+    else if(WANTS_CATS.includes(k))wants+=v;
+  });
+  // Savings from type='saving' transactions this month
+  const savTx=(st.pTx||[]).filter(t=>t.type==='saving'&&t.date&&t.date.startsWith(m));
+  const savings=savTx.reduce((s,t)=>s+t.amt,0);
+  const total=needs+wants+savings;
+  const base=inc>0?inc:total||1;
+  function bar(label,emoji,actual,target,color,bgColor){
+    const actualPct=Math.round(actual/base*100);
+    const targetPct=target;
+    const barW=Math.min(actualPct,100);
+    const over=actualPct>targetPct;
+    const diff=actualPct-targetPct;
+    return`<div style="margin-bottom:14px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px">
+        <div style="font-size:.82rem;font-weight:700">${emoji} ${label}</div>
+        <div style="font-size:.78rem;font-weight:800;color:${over&&actual>0?'#ef4444':color}">
+          ${fmtF(actual)} <span style="color:#aaa;font-weight:500">(${actualPct}% dari income)</span>
+          ${inc>0?`<span style="margin-left:6px;font-size:.68rem;padding:2px 6px;border-radius:99px;background:${over?'#fee2e2':'#dcfce7'};color:${over?'#ef4444':'#16a34a'}">${over?'+'+diff+'%':diff+'%'} dari target ${targetPct}%</span>`:''}
+        </div>
+      </div>
+      <div style="background:#f0f0f8;border-radius:99px;height:10px;position:relative">
+        <div style="background:${color};border-radius:99px;height:10px;width:${barW}%;transition:width .3s;position:relative">
+          ${over?`<div style="position:absolute;right:0;top:0;width:4px;height:10px;background:#ef4444;border-radius:0 99px 99px 0"></div>`:''}
+        </div>
+        <div style="position:absolute;top:-2px;left:${targetPct}%;width:2px;height:14px;background:#333;border-radius:1px;opacity:.4"></div>
+      </div>
+      <div style="font-size:.65rem;color:#aaa;margin-top:3px">Target: ${targetPct}% dari income · Garis hitam = batas ideal</div>
+    </div>`;
+  }
+  let html='';
+  if(inc===0){
+    html+=`<div style="background:#fefce8;border-radius:10px;padding:10px 14px;font-size:.8rem;color:#854d0e;margin-bottom:12px">⚠️ Belum ada income tercatat bulan ini. Catat income dulu di tab Pribadi agar % akurat.</div>`;
+  }
+  html+=bar('Kebutuhan (Needs)','🏠',needs,50,'#6c63ff');
+  html+=bar('Keinginan (Wants)','🛍️',wants,30,'#ec4899');
+  html+=bar('Tabungan (Savings)','💰',savings,20,'#22c55e');
+  // Summary note
+  const uncategorized=total>0?(total-needs-wants-savings):0;
+  if(uncategorized>1000){
+    html+=`<div style="font-size:.75rem;color:#888;margin-top:4px">💡 Ada Rp ${(uncategorized/1e6).toFixed(1)}jt pengeluaran yang belum terkategorikan dalam Needs/Wants.</div>`;
+  }
+  const catBreak=Object.entries(allCats).filter(([k])=>!NEEDS_CATS.includes(k)&&!WANTS_CATS.includes(k));
+  if(catBreak.length){
+    html+=`<details style="margin-top:10px"><summary style="font-size:.75rem;color:#6c63ff;cursor:pointer">Lihat kategori belum diklasifikasi (${catBreak.length})</summary>
+      <div style="font-size:.72rem;color:#888;margin-top:6px">${catBreak.map(([k,v])=>`${k}: ${fmtF(v)}`).join(' · ')}</div>
+    </details>`;
+  }
+  el.innerHTML=html;
+}
+
+// ══════════════════════════
 // REMINDERS
 // ══════════════════════════
 function remRowHtml(r,paid,todayDay){
