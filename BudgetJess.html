@@ -1883,6 +1883,13 @@ function openEM(id,src){
   } else {
     moveRow.style.display='none';
   }
+  // Reset cicilan section
+  const eCicWrap=document.getElementById('e-cicilan-wrap');
+  const eCicCb=document.getElementById('e-is-cicilan');
+  const eCicOpts=document.getElementById('e-cicilan-opts');
+  if(eCicCb)eCicCb.checked=false;
+  if(eCicOpts)eCicOpts.style.display='none';
+  if(eCicWrap)eCicWrap.style.display=(t.type==='expense'&&t.pay&&t.pay.startsWith('CC'))?'':'none';
   document.getElementById('emod').classList.add('open');
 }
 function closeEM(){document.getElementById('emod').classList.remove('open');eId=eSrc=null}
