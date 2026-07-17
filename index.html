@@ -525,7 +525,10 @@ textarea{resize:vertical;min-height:100px;line-height:1.5}
     <button class="export-btn" onclick="exportCSV()">📥 Export Excel/CSV</button>
     <button class="export-btn" onclick="exportPDF()">🖨️ Export PDF</button>
     <button class="export-btn" onclick="exportAllCSV()">📊 Export Semua Bulan</button>
+    <button class="export-btn" onclick="backupJSON()" style="border-color:#22c55e;color:#22c55e">💾 Backup Data JSON</button>
+    <button class="export-btn" onclick="restoreJSON()" style="border-color:#f59e0b;color:#f59e0b">📂 Restore dari Backup</button>
   </div>
+  <input type="file" id="restore-file-input" accept=".json" style="display:none" onchange="doRestoreJSON(this)">
   <div class="cgrid">
     <div class="card full">
       <h3>📈 Tren Pengeluaran Bulanan</h3>
