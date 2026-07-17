@@ -2586,7 +2586,6 @@ function addInstall(){
   if(!st.installments)st.installments=[];
   st.installments.push({id:'inst_'+Date.now(),name,card,monthlyAmt:monthly,totalMonths:total,startYM:start});
   save();
-  closeModal('modal-installment');
   openInstallmentMgr();
   rCCProjection();
   showT('✅ Cicilan ditambah!');
@@ -2595,7 +2594,6 @@ function delInstall(i){
   if(!confirm('Hapus cicilan ini?'))return;
   st.installments.splice(i,1);
   save();
-  closeModal('modal-installment');
   openInstallmentMgr();
   rCCProjection();
   showT('🗑️ Cicilan dihapus');
