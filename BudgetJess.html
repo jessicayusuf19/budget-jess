@@ -2985,8 +2985,11 @@ function rMonthlyProj(){
   const ccRows=cards.map(c=>({name:c.name,day:c.day,amt:ccBillForMonth(c,sm)})).filter(c=>c.amt>0);
   const ccTotal=ccRows.reduce((s,c)=>s+c.amt,0);
 
-  // Routine
+  // Routine — for current month split paid vs unpaid
+  const paidRems=(st.reminderPaid||{})[sm]||{};
   const remTotal=rems.reduce((s,r)=>s+r.amt,0);
+  const remPaidTotal=rems.filter(r=>paidRems[r.id]).reduce((s,r)=>s+r.amt,0);
+  const remUnpaidTotal=remTotal-remPaidTotal;
 
   // Pribadi variable (non-CC cats, avg; if current month use actual)
   function catSpend(txArr,ym){const c={};txArr.filter(t=>t.date.slice(0,7)===ym&&t.type==='expense'&&!ccNames.has(t.pay||'')).forEach(t=>{c[t.cat]=(c[t.cat]||0)+t.amt});return c;}
