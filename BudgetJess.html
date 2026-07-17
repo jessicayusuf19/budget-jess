@@ -1010,6 +1010,26 @@ textarea{resize:vertical;min-height:100px;line-height:1.5}
   </div>
 </div>
 
+<!-- INSTALLMENT MANAGER MODAL -->
+<div class="mover" id="inst-modal">
+  <div class="modal" style="max-height:85vh;overflow-y:auto">
+    <h3 style="margin-bottom:14px">🔄 Kelola Cicilan / Installment</h3>
+    <div id="inst-list"></div>
+    <div style="margin-top:14px;background:#f5f4ff;border-radius:12px;padding:14px">
+      <b style="font-size:.82rem">Tambah Cicilan Baru</b>
+      <div class="fld" style="margin-top:10px"><label>Nama Cicilan</label><input id="inst-name" placeholder="Cicilan Laptop, HP..."></div>
+      <div class="fld"><label>Kartu Kredit</label><select id="inst-card"></select></div>
+      <div class="frow">
+        <div class="fld"><label>Cicilan/Bulan (Rp)</label><input id="inst-monthly" type="number" placeholder="500000" inputmode="numeric"></div>
+        <div class="fld"><label>Total Bulan</label><input id="inst-total" type="number" value="12" min="2" max="60"></div>
+      </div>
+      <div class="fld"><label>Mulai Bulan</label><input id="inst-start" type="month"></div>
+      <button class="btn bg" onclick="addInstall()" style="width:100%;margin-top:6px">+ Tambah Cicilan</button>
+    </div>
+    <button class="btn bw" onclick="document.getElementById('inst-modal').classList.remove('open')" style="width:100%;margin-top:12px">Tutup</button>
+  </div>
+</div>
+
 <div id="toast">✓</div>
 
 <script>
