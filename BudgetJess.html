@@ -1137,7 +1137,12 @@ let fbApp=null,fbDb=null,fbRef=null,fbConnected=false,fbMaxTxCount=0;
 const FB_DB='https://budget-jess-default-rtdb.asia-southeast1.firebasedatabase.app';
 const FB_KEY='Jessica1994';
 function fbRestUrl(){const cfg=loadFbConfig();return`${FB_DB}/budget/${(cfg&&cfg.syncKey)||FB_KEY}.json`;}
-function restPush(){fetch(fbRestUrl(),{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(st)}).catch(()=>{});}
+function localTxCount(){return(st.pTx?st.pTx.length:0)+(st.rtTx?st.rtTx.length:0);}
+function restPush(){
+  // Never overwrite Firebase if it has more transactions than local
+  if(localTxCount()<fbMaxTxCount){console.warn('restPush blocked: local has fewer tx than Firebase');return;}
+  fetch(fbRestUrl(),{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(st)}).catch(()=>{});
+}
 function restPoll(){
   fetch(fbRestUrl()).then(r=>r.ok?r.json():null).then(data=>{
     if(!data)return;
