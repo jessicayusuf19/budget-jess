@@ -2232,6 +2232,37 @@ function unPayCC(payKey,stmtStart,total){
   showT('↩️ Pembayaran CC dibatalkan');
 }
 function closeCCMod(){document.getElementById('ccmod').classList.remove('open')}
+function openCCProjDetail(cardName,label,periodStart,periodEnd,dueYM){
+  const todayStr=new Date().toISOString().split('T')[0];
+  const capEnd=periodEnd>todayStr?todayStr:periodEnd;
+  const txs=[...st.pTx,...st.rtTx]
+    .filter(t=>t.pay===cardName&&(t.type==='expense'||!t.type)&&t.date>=periodStart&&t.date<=capEnd)
+    .sort((a,b)=>b.date.localeCompare(a.date));
+  const total=txs.reduce((s,t)=>s+t.amt,0);
+  const isFuture=periodStart>todayStr;
+  document.getElementById('cc-mod-title').textContent=label+' — Due '+mN(dueYM);
+  document.getElementById('cc-mod-sub').textContent=`Periode: ${periodStart} s/d ${capEnd}${isFuture?' (proyeksi)':''}`;
+  document.getElementById('cc-mod-txs').innerHTML=txs.length
+    ?`<div style="background:#fef3c7;border-radius:10px;padding:10px 14px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center">
+        <span style="font-size:.82rem;font-weight:700;color:#92400e">Total tagihan periode ini</span>
+        <span style="font-size:1rem;font-weight:900;color:#d97706">${fmtF(total)}</span>
+      </div>`
+      +txs.map(t=>{
+        const tsrc=st.pTx.find(x=>x.id===t.id)?'p':'rt';
+        return`<div class="txi">
+          <div class="txico" style="background:#fef3c7">${anyIco(t.cat||'')}</div>
+          <div class="txinfo"><div class="txd">${t.desc}</div><div class="txm">${t.date} · ${t.cat||''}</div></div>
+          <div style="display:flex;align-items:center;gap:3px">
+            <div class="txa">${fmtF(t.amt)}</div>
+            <button class="dbtn" title="Edit" onclick="closeCCMod();openEM('${t.id}','${tsrc}')">✏️</button>
+          </div>
+        </div>`;}).join('')
+    :isFuture
+      ?`<div class="empty"><div class="ei">📅</div><p>Periode belum dimulai — angka proyeksi berdasarkan rata-rata historis</p></div>`
+      :`<div class="empty"><div class="ei">🎉</div><p>Belum ada transaksi di periode ini</p></div>`;
+  document.getElementById('cc-mod-pay-section').innerHTML='';
+  document.getElementById('ccmod').classList.add('open');
+}
 function saveAN(n){
   const k={1:'bca1',2:'bca2',3:'bri'}[n],d={1:'BCA Operasional',2:'BCA Tabungan',3:'BRI'}[n];
   st.acc[k].name=document.getElementById('sn'+n).value||d;save();rSavBals();
