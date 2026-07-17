@@ -2907,6 +2907,129 @@ function r5030(){
 }
 
 // ══════════════════════════
+// MONTHLY CASH FLOW PROJECTION
+// ══════════════════════════
+let monthlyProjSel=null;
+function selMonthlyProj(m){monthlyProjSel=m;rMonthlyProj();}
+function rMonthlyProj(){
+  const el=document.getElementById('ov-monthly-proj');if(!el)return;
+  const cards=getCCards();
+  const allTx=[...(st.pTx||[]),...(st.rtTx||[])];
+  const rems=(st.reminders||[]).filter(r=>r.amt>0);
+  const todayDate=new Date(),todayStr=todayDate.toISOString().split('T')[0],todayDay=todayDate.getDate();
+  const projMonths=[];for(let i=0;i<6;i++)projMonths.push(addMonths(nowM(),i));
+  if(!monthlyProjSel||!projMonths.includes(monthlyProjSel))monthlyProjSel=projMonths[0];
+
+  // Shared helpers (same logic as rCCProjection)
+  function ymd(y,m,d){while(m<0){m+=12;y--;}while(m>11){m-=12;y++;}return y+'-'+String(m+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');}
+  function getBP(day,dueYM){
+    const[dy,dm]=dueYM.split('-').map(Number),offset=todayDay>=day?-1:0,dm0=dm-1;
+    const peStr=ymd(dy,dm0+offset,day),psStr=ymd(dy,dm0+offset-1,day);
+    return{periodStart:psStr,periodEnd:peStr,isFuture:psStr>todayStr,isCurrent:psStr<=todayStr&&peStr>=todayStr};
+  }
+  function startDue(day){return todayDay>=day?addMonths(nowM(),1):nowM();}
+  function spendRange(card,s,e){const cap=e>todayStr?todayStr:e;if(cap<s)return 0;return allTx.filter(t=>t.pay===card&&(t.type==='expense'||!t.type)&&t.date>=s&&t.date<=cap).reduce((a,t)=>a+t.amt,0);}
+  function futSched(card,s,e){return allTx.filter(t=>t.pay===card&&(t.type==='expense'||!t.type)&&t.date>todayStr&&t.date>=s&&t.date<=e).reduce((a,t)=>a+t.amt,0);}
+  function avgCC(card){
+    const s=startDue(card.day);let tot=0,cnt=0;
+    for(let i=1;i<=3;i++){const p=getBP(card.day,addMonths(s,-i));const v=spendRange(card.name,p.periodStart,p.periodEnd);if(v>0){tot+=v;cnt++;}}
+    if(!cnt){const p=getBP(card.day,s);return spendRange(card.name,p.periodStart,p.periodEnd);}
+    return Math.round(tot/cnt);
+  }
+  function ccBillForMonth(card,dueYM){
+    if(ymDiff(dueYM,startDue(card.day))<0||ymDiff(dueYM,startDue(card.day))>=6)return 0;
+    const p=getBP(card.day,dueYM);
+    const inst=(st.installments||[]).filter(i=>i.card===card.name&&ymDiff(dueYM,i.startYM)>=0&&ymDiff(dueYM,i.startYM)<i.totalMonths).reduce((a,i)=>a+i.monthlyAmt,0);
+    const base=p.isFuture?avgCC(card):spendRange(card.name,p.periodStart,p.periodEnd);
+    return base+futSched(card.name,p.periodStart,p.periodEnd)+inst;
+  }
+
+  // Income & spending averages (last 3 months)
+  const ms=allM(),last3=ms.slice(-3);
+  const avgInc=last3.length?Math.round(last3.reduce((s,m)=>s+pMD(m).inc,0)/last3.length):0;
+  const avgTotalSpend=last3.length?Math.round(last3.reduce((s,m)=>s+pMD(m).total+rtMD(m).total,0)/last3.length):0;
+  const avgCCTotal=Math.round(cards.reduce((s,c)=>s+avgCC(c),0));
+  const remTotal=rems.reduce((s,r)=>s+r.amt,0);
+  const avgOther=Math.max(0,avgTotalSpend-avgCCTotal-remTotal);
+
+  // Month chips
+  let html=`<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px">`;
+  projMonths.forEach(m=>{
+    const sel=m===monthlyProjSel;
+    html+=`<button onclick="selMonthlyProj('${m}')" style="border:none;padding:6px 14px;border-radius:99px;font-size:.8rem;font-weight:700;cursor:pointer;background:${sel?'#6c63ff':'#f0f0f8'};color:${sel?'#fff':'#666'}">${mN(m)}</button>`;
+  });
+  html+=`</div>`;
+
+  // Compute for selected month
+  const sm=monthlyProjSel;
+  const ccRows=cards.map(c=>({name:c.name,day:c.day,amt:ccBillForMonth(c,sm)})).filter(c=>c.amt>0);
+  const ccTotal=ccRows.reduce((s,c)=>s+c.amt,0);
+  const totalKeluar=ccTotal+remTotal+avgOther;
+  const net=avgInc-totalKeluar;
+
+  html+=`<div style="background:var(--bg);border-radius:14px;padding:4px 0">`;
+
+  // Income row
+  html+=`<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 4px;border-bottom:2px solid var(--rowborder)">
+    <div style="font-size:.85rem;font-weight:800;color:#16a34a">💰 Estimasi Income</div>
+    <div style="font-size:.95rem;font-weight:900;color:#16a34a">${avgInc>0?fmtF(avgInc):'—'}</div>
+  </div>`;
+
+  // CC bills
+  if(ccRows.length){
+    html+=`<div style="font-size:.72rem;font-weight:800;color:#6c63ff;padding:10px 4px 4px;letter-spacing:.03em">💳 TAGIHAN KARTU KREDIT</div>`;
+    ccRows.forEach(c=>{
+      html+=`<div style="display:flex;justify-content:space-between;padding:7px 4px 7px 14px;border-bottom:1px solid var(--rowborder);font-size:.83rem">
+        <div style="color:var(--sub)">${c.name} <span style="color:#bbb;font-size:.7rem">· due tgl ${c.day}</span></div>
+        <div style="font-weight:700;color:#6c63ff">${fmtF(c.amt)}</div>
+      </div>`;
+    });
+    html+=`<div style="display:flex;justify-content:space-between;padding:6px 4px 6px 14px;font-size:.82rem;font-weight:800">
+      <div style="color:var(--sub)">Subtotal CC</div><div style="color:#6c63ff">${fmtF(ccTotal)}</div>
+    </div>`;
+  }
+
+  // Routine payments
+  if(rems.length){
+    html+=`<div style="font-size:.72rem;font-weight:800;color:#f59e0b;padding:10px 4px 4px;letter-spacing:.03em">🔔 PEMBAYARAN RUTIN</div>`;
+    rems.forEach(r=>{
+      html+=`<div style="display:flex;justify-content:space-between;padding:7px 4px 7px 14px;border-bottom:1px solid var(--rowborder);font-size:.83rem">
+        <div style="color:var(--sub)">${r.name} <span style="color:#bbb;font-size:.7rem">· tgl ${r.day}</span></div>
+        <div style="font-weight:700;color:#f59e0b">${fmtF(r.amt)}</div>
+      </div>`;
+    });
+    html+=`<div style="display:flex;justify-content:space-between;padding:6px 4px 6px 14px;font-size:.82rem;font-weight:800">
+      <div style="color:var(--sub)">Subtotal Rutin</div><div style="color:#f59e0b">${fmtF(remTotal)}</div>
+    </div>`;
+  }
+
+  // Other variable
+  if(avgOther>0){
+    html+=`<div style="font-size:.72rem;font-weight:800;color:#ec4899;padding:10px 4px 4px;letter-spacing:.03em">📦 PENGELUARAN LAINNYA</div>`;
+    html+=`<div style="display:flex;justify-content:space-between;padding:7px 4px 7px 14px;border-bottom:1px solid var(--rowborder);font-size:.83rem">
+      <div style="color:var(--sub)">Variable spending <span style="color:#bbb;font-size:.7rem">(avg 3 bln)</span></div>
+      <div style="font-weight:700;color:#ec4899">${fmtF(avgOther)}</div>
+    </div>`;
+  }
+
+  // Total & NET
+  html+=`<div style="border-top:2px solid var(--rowborder);margin-top:8px;padding-top:10px">
+    <div style="display:flex;justify-content:space-between;font-size:.85rem;font-weight:700;padding:4px 4px 8px">
+      <div style="color:var(--sub)">Total Estimasi Keluar</div>
+      <div style="color:#ef4444">${fmtF(totalKeluar)}</div>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 16px;background:${net>=0?'#f0fdf4':'#fff1f2'};border-radius:12px">
+      <div style="font-size:.88rem;font-weight:800;color:${net>=0?'#16a34a':'#dc2626'}">Estimasi NET ${mN(sm)}</div>
+      <div style="font-size:1.1rem;font-weight:900;color:${net>=0?'#16a34a':'#dc2626'}">${net>=0?'+':''}${fmtF(net)}</div>
+    </div>
+  </div>`;
+
+  html+=`</div>`;
+  html+=`<div style="font-size:.68rem;color:#aaa;margin-top:8px;line-height:1.5">* Income & pengeluaran lainnya = rata-rata 3 bulan terakhir. CC = proyeksi siklus billing aktual + cicilan terjadwal.</div>`;
+  el.innerHTML=html;
+}
+
+// ══════════════════════════
 // REMINDERS
 // ══════════════════════════
 function remRowHtml(r,paid,todayDay){
