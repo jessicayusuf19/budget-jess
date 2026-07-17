@@ -1133,7 +1133,7 @@ function refreshCatDropdowns(){
 // ══════════════════════════
 // FIREBASE SYNC
 // ══════════════════════════
-let fbApp=null,fbDb=null,fbRef=null,fbConnected=false;
+let fbApp=null,fbDb=null,fbRef=null,fbConnected=false,fbMaxTxCount=0;
 const FB_DB='https://budget-jess-default-rtdb.asia-southeast1.firebasedatabase.app';
 const FB_KEY='Jessica1994';
 function fbRestUrl(){const cfg=loadFbConfig();return`${FB_DB}/budget/${(cfg&&cfg.syncKey)||FB_KEY}.json`;}
