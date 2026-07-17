@@ -3044,12 +3044,14 @@ function rMonthlyProj(){
   if(rems.length){
     html+=secHead('🔔','PEMBAYARAN RUTIN','#f59e0b');
     rems.forEach(r=>{
-      html+=`<div style="display:flex;justify-content:space-between;padding:7px 4px 7px 14px;border-bottom:1px solid var(--rowborder);font-size:.83rem">
-        <div style="color:var(--sub)">${r.name} <span style="color:#bbb;font-size:.7rem">· tgl ${r.day}</span></div>
-        <div style="font-weight:700;color:#f59e0b">${fmtF(r.amt)}</div></div>`;
+      const isPaid=isCurMonth&&!!paidRems[r.id];
+      html+=`<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 4px 7px 14px;border-bottom:1px solid var(--rowborder);font-size:.83rem">
+        <div style="color:var(--sub)">${r.name} <span style="color:#bbb;font-size:.7rem">· tgl ${r.day}</span>${isPaid?` <span style="font-size:.65rem;background:#dcfce7;color:#16a34a;border-radius:6px;padding:1px 5px;font-weight:700">✓ lunas</span>`:''}</div>
+        <div style="font-weight:700;color:${isPaid?'#16a34a':'#f59e0b'}">${fmtF(r.amt)}</div></div>`;
     });
     html+=`<div style="display:flex;justify-content:space-between;padding:6px 4px 8px 14px;font-size:.82rem;font-weight:800">
-      <div style="color:var(--sub)">Subtotal Rutin</div><div style="color:#f59e0b">${fmtF(remTotal)}</div></div>`;
+      <div style="color:var(--sub)">Subtotal Rutin${isCurMonth&&remPaidTotal>0?` <span style="font-size:.7rem;font-weight:600;color:#16a34a">(${fmtF(remPaidTotal)} lunas)</span>`:''}</div>
+      <div style="color:#f59e0b">${fmtF(remTotal)}</div></div>`;
   }
 
   // Pribadi variable
