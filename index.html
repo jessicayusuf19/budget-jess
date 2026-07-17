@@ -1197,22 +1197,22 @@ function initFirebase(cfg){
     fbDb=firebase.database(fbApp);fbRef=fbDb.ref('budget/'+cfg.syncKey);fbConnected=true;
     fbRef.on('value',(snap)=>{
       const data=snap.val();
-      const remotePCount=(data&&data.pTx)?data.pTx.length:0;
-      const remoteRTCount=(data&&data.rtTx)?data.rtTx.length:0;
-      const remoteTotal=remotePCount+remoteRTCount;
-      const localTotal=(st.pTx?st.pTx.length:0)+(st.rtTx?st.rtTx.length:0);
+      const remoteTotal=(data?(data.pTx?data.pTx.length:0)+(data.rtTx?data.rtTx.length:0):0);
+      const localTotal=localTxCount();
+      // Always track the highest count ever seen from Firebase
+      if(remoteTotal>fbMaxTxCount)fbMaxTxCount=remoteTotal;
       const remoteHasData=remoteTotal>0;
       const localHasData=localTotal>0;
       if(remoteHasData){
-        // Always take Firebase if it has MORE or EQUAL transactions (prevents old device from overwriting)
+        // Take Firebase data if it has more OR equal transactions (protects against old device overwrite)
         if(remoteTotal>=localTotal){
           const remoteStr=JSON.stringify(data),localStr=JSON.stringify(st);
           if(remoteStr!==localStr){st={...DEF,...data};if(!st.xi)st.xi={};if(!st.budgets)st.budgets={};runMigrations();localStorage.setItem('jb_v5',JSON.stringify(st));autoBackup();rerenderCurrent();}
+        } else {
+          // Local has MORE — push local up
+          fbRef.set(st);
         }
-        // If local has MORE transactions than Firebase, push local up (local is newer)
-        else if(localTotal>remoteTotal){fbRef.set(st);}
-      }else if(localHasData){
-        fbRef.set(st);
+      }else if(localHasData){fbRef.set(st);
       }else if(!data){fbRef.set(st);}
       setSyncStatus('connected');
     },(err)=>{console.error(err);setSyncStatus('error');fbConnected=false;showT('❌ Gagal: '+err.message)});
