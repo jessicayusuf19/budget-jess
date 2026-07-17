@@ -1228,10 +1228,12 @@ function forcePullFirebase(){
     }
     runMigrations();
     localStorage.setItem('jb_v5',JSON.stringify(st));
-    // Also reconnect Firebase SDK if config exists
+    // Push merged data back to Firebase so HP gets complete data too
+    restPush();
+    // Reconnect Firebase SDK if config exists
     const cfg=loadFbConfig();if(cfg&&!fbRef)initFirebase(cfg);
     rOV();rPD();rRTD();rSavBals();
-    showT('✅ Data dari HP berhasil diambil! '+((st.pTx||[]).length+(st.rtTx||[]).length)+' transaksi loaded.');
+    showT('✅ Sync berhasil! '+((st.pTx||[]).length+(st.rtTx||[]).length)+' transaksi. HP akan terupdate otomatis.');
   }).catch(e=>showT('❌ Gagal ambil data: '+e.message));
 }
 function forceResync(){
