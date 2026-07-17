@@ -849,7 +849,7 @@ textarea{resize:vertical;min-height:100px;line-height:1.5}
     <div class="fld"><label>Jumlah (Rp)</label><input type="number" id="e-amt" inputmode="numeric"></div>
     <div id="e-catrow" class="frow">
       <div class="fld"><label>Kategori</label><select id="e-cat"></select></div>
-      <div class="fld"><label>Bayar via</label><select id="e-pay">
+      <div class="fld"><label>Bayar via</label><select id="e-pay" onchange="checkECicilanShow()">
         <option value="Cash">💵 Cash</option>
         <option value="Transfer BCA">🏦 BCA</option>
         <option value="BCA 6080">🏦 BCA 6080</option>
@@ -859,6 +859,15 @@ textarea{resize:vertical;min-height:100px;line-height:1.5}
         <option value="CC UOB">💳 CC UOB</option>
         <option value="BRI">🏦 BRI</option>
       </select></div>
+    </div>
+    <div id="e-cicilan-wrap" style="background:#f5f4ff;border-radius:10px;padding:10px 12px;margin-top:8px;display:none">
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:.82rem;font-weight:700;color:#6c63ff">
+        <input type="checkbox" id="e-is-cicilan" onchange="toggleECicilan()"> 🔄 Jadikan Cicilan / Installment
+      </label>
+      <div id="e-cicilan-opts" style="display:none;margin-top:8px">
+        <div class="fld"><label>Berapa bulan?</label><input type="number" id="e-cicilan-n" value="3" min="2" max="60" inputmode="numeric" oninput="updateECicilanInfo()"></div>
+        <div id="e-cicilan-info" style="font-size:.78rem;color:#6c63ff;font-weight:700;margin-top:4px"></div>
+      </div>
     </div>
     <div style="display:flex;gap:10px;margin-top:4px">
       <button class="btn bw" onclick="closeEM()" style="flex:1">Batal</button>
