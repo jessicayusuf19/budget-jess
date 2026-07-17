@@ -2672,8 +2672,17 @@ function rCCProjection(){
       const p=getBillingPeriod(c.day,dueYM);
       const inst=installAmtForYM(c.name,dueYM);
       let spend,tag;
-      if(p.isFuture){spend=getAvgSpend(c);tag='proyeksi';}
-      else{spend=ccSpendRange(c.name,p.periodStart,p.periodEnd);tag=p.isCurrent?'berjalan':'';}
+      if(p.isFuture){
+        const avg=getAvgSpend(c);
+        const scheduled=ccScheduledFuture(c.name,p.periodStart,p.periodEnd);
+        spend=avg+scheduled;
+        tag=scheduled>0?`proyeksi+cicilan ${fmtF(scheduled)}`:'proyeksi';
+      } else {
+        spend=ccSpendRange(c.name,p.periodStart,p.periodEnd);
+        const scheduled=ccScheduledFuture(c.name,p.periodStart,p.periodEnd);
+        spend+=scheduled;
+        tag=p.isCurrent?'berjalan':'';
+      }
       return{proj:spend+inst,inst,tag};
     });
     const total=vals.reduce((s,v)=>s+v.proj,0);
