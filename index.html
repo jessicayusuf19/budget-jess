@@ -1860,7 +1860,7 @@ function confirmDel(){
     if(t)reverseAcc(t.pay,t.amt,t);
     st.rtTx=st.rtTx.filter(x=>x.id!==pD);
   }
-  save();closeDM();if(pS==='p')rPD();else rRTD();rSavBals();showT('🗑 Dihapus');
+  fbMaxTxCount=localTxCount();save();closeDM();if(pS==='p')rPD();else rRTD();rSavBals();showT('🗑 Dihapus');
 }
 
 // ══════════════════════════
