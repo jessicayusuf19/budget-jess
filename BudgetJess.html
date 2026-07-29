@@ -1189,8 +1189,6 @@ const FB_KEY='Jessica1994';
 function fbRestUrl(){const cfg=loadFbConfig();return`${FB_DB}/budget/${(cfg&&cfg.syncKey)||FB_KEY}.json`;}
 function localTxCount(){return(st.pTx?st.pTx.length:0)+(st.rtTx?st.rtTx.length:0);}
 function restPush(){
-  // Never overwrite Firebase if it has more transactions than local
-  if(localTxCount()<fbMaxTxCount){console.warn('restPush blocked: local has fewer tx than Firebase');return;}
   fetch(fbRestUrl(),{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(st)}).catch(()=>{});
 }
 let _skipPollUntil=0;
