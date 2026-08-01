@@ -2084,7 +2084,7 @@ function openAccDetail(acc){
         <div style="display:flex;align-items:center;gap:4px">
           <div class="txa${h.type==='masuk'?' pos':''}">${h.type==='masuk'?'+':'-'}${fmt(h.amt)}</div>
           <button class="dbtn" onclick="openSavhEdit('${acc}',${i})">✏️</button>
-          <button class="dbtn" onclick="delAccHist('${acc}','${h.date}','${h.desc}',${h.amt},'${h.type}')">🗑</button>
+          <button class="dbtn" onclick="delAccHist('${acc}','${h.date}','${(h.desc||'').replace(/'/g,"&#39;")}',${h.amt},'${h.type}')">🗑</button>
         </div>
       </div>`).join('')
     :'<div class="empty"><div class="ei">📭</div><p>Belum ada riwayat transaksi</p></div>';
