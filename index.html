@@ -1197,10 +1197,16 @@ function restPoll(){
   fetch(fbRestUrl()).then(r=>r.ok?r.json():null).then(data=>{
     if(!data)return;
     const remoteTotal=(data.pTx?.length||0)+(data.rtTx?.length||0);
-    // Never overwrite local with Firebase if local has fewer tx (user just deleted)
-    if(remoteTotal>localTxCount())return;
     const rem=JSON.stringify(data),loc=JSON.stringify(st);
-    if(rem!==loc){st={...DEF,...data};if(!st.xi)st.xi={};if(!st.budgets)st.budgets={};if(!st.ccards){const cb=st.ccbilling||{};st.ccards=[{key:'cimb',name:'CC CIMB',day:cb.cimb||21},{key:'bca',name:'CC BCA',day:cb.bca||17},{key:'uob',name:'CC UOB',day:cb.uob||11}];}runMigrations();localStorage.setItem('jb_v5',JSON.stringify(st));rerenderCurrent();setSyncStatus('connected');}
+    if(rem===loc)return;
+    if(remoteTotal>localTxCount()){
+      // Remote has more tx (local deletion not yet synced) — sync settings only, keep local tx
+      st={...DEF,...data,pTx:st.pTx,rtTx:st.rtTx};
+    }else{
+      st={...DEF,...data};
+    }
+    if(!st.xi)st.xi={};if(!st.budgets)st.budgets={};if(!st.ccards){const cb=st.ccbilling||{};st.ccards=[{key:'cimb',name:'CC CIMB',day:cb.cimb||21},{key:'bca',name:'CC BCA',day:cb.bca||17},{key:'uob',name:'CC UOB',day:cb.uob||11}];}
+    runMigrations();localStorage.setItem('jb_v5',JSON.stringify(st));rerenderCurrent();setSyncStatus('connected');
   }).catch(()=>{});}
 let _restInterval=null;
 
