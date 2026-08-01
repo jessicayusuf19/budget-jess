@@ -1636,6 +1636,14 @@ function openOvCatDetail(m,cat,src){
 }
 function rOV(){
   const ms=allM();
+  // Month chips
+  if(!ovSelM||!ms.includes(ovSelM))ovSelM=nowM();
+  const chipEl=document.getElementById('ov-month-chips');
+  if(chipEl)chipEl.innerHTML=ms.map(m=>{
+    const sel=m===ovSelM;
+    return`<button class="ov-m-chip${sel?' active':''}" data-m="${m}" onclick="selOvM('${m}')" style="border:none;padding:5px 13px;border-radius:99px;font-size:.78rem;font-weight:700;cursor:pointer;background:${sel?'#6c63ff':'#f0f0f8'};color:${sel?'#fff':'#666'}">${mS(m)}</button>`;
+  }).join('');
+  rOvMonthDetail();
   let tInc=0,tP=0,tRT=0,sur=0,def=0;
   ms.forEach(m=>{const p=pMD(m),rt=rtMD(m);tInc+=p.inc;tP+=p.total;tRT+=rt.total;(p.inc-p.total-rt.total>=0)?sur++:def++});
   const tsav=(st.acc.bca1.balance||0)+(st.acc.bca2.balance||0)+(st.acc.bri.balance||0);
