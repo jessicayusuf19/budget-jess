@@ -3535,6 +3535,7 @@ function openGoalMod(idx){
   const g=idx>=0?(st.goals||[])[idx]:null;
   document.getElementById('goalmod-t').textContent=idx>=0?'✏️ Edit Goal':'🎯 Tambah Goal';
   document.getElementById('goal-ico').value=g?.ico||'';
+  renderIconGrid('goal-ico-grid','goal-ico',GOAL_ICONS,g?.ico||'');
   document.getElementById('goal-name').value=g?.name||'';
   document.getElementById('goal-target').value=g?.target||'';
   document.getElementById('goal-saved').value=g?.saved||0;
