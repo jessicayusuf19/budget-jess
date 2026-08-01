@@ -2560,24 +2560,38 @@ function saveXIM(){
 
 function rBudgetList(){
   const bud=st.budgets||{};
-  const entries=Object.entries(bud).filter(([,v])=>v>0);
-  document.getElementById('set-budgets').innerHTML=entries.length?entries.map(([c,v])=>`
-    <div class="cat-item">
-      <div class="cat-ico-lbl">${anyIco(c)}</div>
-      <div class="cat-name-lbl">${c}</div>
-      <div style="font-size:.82rem;font-weight:800;color:#f59e0b">${fmt(v)}/bln</div>
-      <button class="cat-act-btn" onclick="delBudget('${c}')" title="Hapus">🗑</button>
-    </div>`).join(''):'<div style="font-size:.79rem;color:#bbb;padding:8px 0">Belum ada budget target. Opsional — set jika ingin ada batas pengeluaran per kategori.</div>';
+  const pCats=(st.pcats||DEF_PCATS).map(c=>c.name);
+  const rtCats=(st.rtcats||DEF_RTCATS).map(c=>c.name);
+  function rows(cats,color){
+    return cats.map(c=>{
+      const v=bud[c]||0;
+      return`<div style="display:flex;align-items:center;gap:8px;padding:7px 4px;border-bottom:1px solid var(--rowborder)">
+        <div style="font-size:1rem;width:24px;text-align:center">${anyIco(c)}</div>
+        <div style="flex:1;font-size:.83rem;font-weight:600;color:var(--fg)">${c}</div>
+        <div style="display:flex;align-items:center;gap:4px">
+          <input type="number" data-cat="${c.replace(/"/g,'&quot;')}" value="${v}" placeholder="0" inputmode="numeric"
+            style="width:110px;padding:5px 8px;border:1.5px solid ${v>0?color:'#e0e0ef'};border-radius:8px;font-size:.82rem;font-weight:700;color:${v>0?color:'#aaa'};text-align:right"
+            oninput="this.style.borderColor=this.value>0?'${color}':'#e0e0ef';this.style.color=this.value>0?'${color}':'#aaa'">
+          <span style="font-size:.7rem;color:#bbb">/bln</span>
+        </div>
+      </div>`;
+    }).join('');
+  }
+  document.getElementById('set-budgets').innerHTML=
+    `<div style="font-size:.72rem;font-weight:800;color:#6c63ff;padding:8px 0 4px;letter-spacing:.04em">👤 PRIBADI</div>`
+    +rows(pCats,'#6c63ff')
+    +`<div style="font-size:.72rem;font-weight:800;color:#f59e0b;padding:12px 0 4px;letter-spacing:.04em">🏡 RUMAH TANGGA</div>`
+    +rows(rtCats,'#f59e0b');
 }
-
-function saveBudget(){
-  const cat=document.getElementById('bud-cat').value;
-  const amt=parseFloat(document.getElementById('bud-amt').value);
-  if(!cat||!amt||amt<=0){showT('❌ Pilih kategori dan isi budget!');return}
+function saveAllBudgets(){
   if(!st.budgets)st.budgets={};
-  st.budgets[cat]=amt;save();
-  document.getElementById('bud-amt').value='';
-  showT('🎯 Budget disimpan!');rBudgetList();
+  document.querySelectorAll('#set-budgets input[data-cat]').forEach(inp=>{
+    const cat=inp.getAttribute('data-cat');
+    const v=parseFloat(inp.value)||0;
+    if(v>0)st.budgets[cat]=v;
+    else delete st.budgets[cat];
+  });
+  save();checkBudgetAlerts();showT('💾 Budget tersimpan!');
 }
 function delBudget(cat){
   if(!st.budgets)return;
