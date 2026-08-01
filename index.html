@@ -1263,13 +1263,15 @@ function initFirebase(cfg){
       const remoteHasData=remoteTotal>0;
       const localHasData=localTotal>0;
       if(remoteHasData){
-        // Take Firebase data if it has more OR equal transactions (protects against old device overwrite)
+        const remoteStr=JSON.stringify(data),localStr=JSON.stringify(st);
         if(remoteTotal>=localTotal){
-          const remoteStr=JSON.stringify(data),localStr=JSON.stringify(st);
+          // Remote has same or more tx — take Firebase (full sync)
           if(remoteStr!==localStr){st={...DEF,...data};if(!st.xi)st.xi={};if(!st.budgets)st.budgets={};runMigrations();localStorage.setItem('jb_v5',JSON.stringify(st));autoBackup();rerenderCurrent();}
         } else {
-          // Local has MORE — push local up
-          fbRef.set(st);
+          // Local has more tx — merge: keep local tx, take Firebase settings
+          const merged={...DEF,...data,pTx:st.pTx,rtTx:st.rtTx};
+          const mergedStr=JSON.stringify(merged);
+          if(mergedStr!==localStr){st=merged;if(!st.xi)st.xi={};if(!st.budgets)st.budgets={};runMigrations();localStorage.setItem('jb_v5',mergedStr);autoBackup();rerenderCurrent();}
         }
       }else if(localHasData){fbRef.set(st);
       }else if(!data){fbRef.set(st);}
