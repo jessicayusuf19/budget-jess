@@ -3006,7 +3006,7 @@ function rMonthlyProj(){
   const pVarTotal=Object.values(pVarCats).reduce((s,v)=>s+v,0);
   const rtVarTotal=Object.values(rtVarCats).reduce((s,v)=>s+v,0);
 
-  const totalKeluar=ccTotal+remTotal+pVarTotal+rtVarTotal;
+  const totalKeluar=ccTotal+(isCurMonth?remPaidTotal+remUnpaidTotal:remTotal)+pVarTotal+rtVarTotal;
   const net=dispInc-totalKeluar;
 
   // Section header helper
