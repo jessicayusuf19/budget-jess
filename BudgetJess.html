@@ -2056,7 +2056,7 @@ function confirmSM(){
   const date=document.getElementById('smod-date').value||today();
   if(!amt||amt<=0){showT('❌ Masukkan jumlah!');return}
   const{acc,type}=smSt;
-  if(type==='set')st.acc[acc].balance=amt;
+  if(type==='set'){st.acc[acc].balance=amt;st.savH.unshift({id:'set_'+acc+'_'+Date.now(),date,desc,amt,acc,type:'set'});}
   else if(type==='masuk'){st.acc[acc].balance=(st.acc[acc].balance||0)+amt;st.savH.unshift({date,desc,amt,acc,type:'masuk'})}
   else{st.acc[acc].balance=Math.max(0,(st.acc[acc].balance||0)-amt);st.savH.unshift({date,desc,amt,acc,type:'keluar'})}
   save();closeSM();rSav();showT('✅ Tersimpan!');
