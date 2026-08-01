@@ -1162,7 +1162,7 @@ function getCCards(){return st.ccards||[{key:'cimb',name:'CC CIMB',day:21},{key:
 function getPayMethods(){
   const base=['Cash','Transfer BCA','Transfer BRI'];
   const ccNames=getCCards().map(c=>c.name);
-  const custom=(st.payMethods||[]).filter(m=>!base.includes(m)&&!m.startsWith('CC'));
+  const custom=(st.payMethods||[]).filter(m=>!base.includes(m)&&!ccNames.includes(m));
   return[...base,...ccNames,...custom];
 }
 const BRI_METHODS=['Transfer BRI','BRI'];
