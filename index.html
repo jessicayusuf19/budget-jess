@@ -683,14 +683,9 @@ textarea{resize:vertical;min-height:100px;line-height:1.5}
         <h3>🎯 Budget Target per Bulan</h3>
         <span style="font-size:.72rem;color:#bbb;font-weight:600">opsional — batas pengeluaran</span>
       </div>
+      <div style="font-size:.75rem;color:#888;margin-bottom:12px">Set budget per kategori. Isi 0 = tidak ada limit. Klik 💾 Simpan Semua setelah edit.</div>
       <div id="set-budgets"></div>
-      <div style="margin-top:14px;padding-top:14px;border-top:1px solid #f0f0f8">
-        <div class="frow">
-          <div class="fld"><label>Kategori</label><select id="bud-cat"></select></div>
-          <div class="fld"><label>Budget/Bulan (Rp)</label><input type="number" id="bud-amt" placeholder="0" inputmode="numeric"></div>
-        </div>
-        <button class="btn bo" onclick="saveBudget()" style="margin-top:4px">🎯 Set Budget</button>
-      </div>
+      <button class="btn bo" onclick="saveAllBudgets()" style="margin-top:12px;width:100%">💾 Simpan Semua Budget</button>
     </div>
 
   </div>
