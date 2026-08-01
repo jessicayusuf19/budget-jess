@@ -1251,25 +1251,23 @@ function connectFirebase(){
 function initFirebase(cfg){
   try{
     setSyncStatus('syncing');
+    if(fbRef){try{fbRef.off()}catch{}}
     if(fbApp){try{fbApp.delete()}catch{}}
     fbApp=firebase.initializeApp({apiKey:cfg.apiKey,authDomain:cfg.authDomain,databaseURL:cfg.databaseURL,projectId:cfg.projectId,storageBucket:cfg.storageBucket,messagingSenderId:cfg.messagingSenderId,appId:cfg.appId},'budget-'+Date.now());
     fbDb=firebase.database(fbApp);fbRef=fbDb.ref('budget/'+cfg.syncKey);fbConnected=true;
     fbRef.on('value',(snap)=>{
+      if(Date.now()<_skipPollUntil)return;
       const data=snap.val();
       const remoteTotal=(data?(data.pTx?data.pTx.length:0)+(data.rtTx?data.rtTx.length:0):0);
       const localTotal=localTxCount();
-      // Always track the highest count ever seen from Firebase
-      if(remoteTotal>fbMaxTxCount)fbMaxTxCount=remoteTotal;
       const remoteHasData=remoteTotal>0;
       const localHasData=localTotal>0;
       if(remoteHasData){
         const remoteStr=JSON.stringify(data),localStr=JSON.stringify(st);
         if(remoteTotal>=localTotal){
-          // Remote has same or more tx — take Firebase (full sync)
           if(remoteStr!==localStr){st={...DEF,...data};if(!st.xi)st.xi={};if(!st.budgets)st.budgets={};runMigrations();localStorage.setItem('jb_v5',JSON.stringify(st));autoBackup();rerenderCurrent();}
         } else {
-          // Local has more tx — merge: keep local tx, take Firebase settings
-          const merged={...DEF,...data,pTx:st.pTx,rtTx:st.rtTx};
+          const merged={...DEF,...data,pTx:st.pTx,rtTx:st.rtTx,acc:st.acc,savH:st.savH};
           const mergedStr=JSON.stringify(merged);
           if(mergedStr!==localStr){st=merged;if(!st.xi)st.xi={};if(!st.budgets)st.budgets={};runMigrations();localStorage.setItem('jb_v5',mergedStr);autoBackup();rerenderCurrent();}
         }
