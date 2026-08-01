@@ -2631,6 +2631,8 @@ function openCatMod(which,idx){
     document.getElementById('cat-name').value='';
     document.getElementById('cat-color').value='#6c63ff';
   }
+  const currentIco=isEdit?cats[idx].ico:'';
+  renderIconGrid('cat-ico-grid','cat-ico',CAT_ICONS,currentIco);
   document.getElementById('catmod').classList.add('open');
 }
 function closeCatMod(){document.getElementById('catmod').classList.remove('open');catWhich=catIdx=null}
