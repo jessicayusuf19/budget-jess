@@ -3576,6 +3576,8 @@ function doRestoreJSON(input){
       const parsed=JSON.parse(e.target.result);
       if(!parsed.pTx)throw new Error('Format tidak valid');
       st={...DEF,...parsed};
+      if(!st.xi)st.xi={};if(!st.budgets)st.budgets={};
+      runMigrations();
       localStorage.setItem('jb_v5',JSON.stringify(st));
       restPush();
       rerenderCurrent();
