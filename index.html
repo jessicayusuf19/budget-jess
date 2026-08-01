@@ -1563,6 +1563,77 @@ function go(t){
 // OVERVIEW
 // ══════════════════════════
 let ovB=null,ovD=null;
+// ── Overview month detail ──
+let ovSelM=null;
+function selOvM(m){
+  ovSelM=m;
+  document.querySelectorAll('.ov-m-chip').forEach(c=>c.classList.toggle('active',c.dataset.m===m));
+  rOvMonthDetail();
+}
+function rOvMonthDetail(){
+  const el=document.getElementById('ov-month-detail');if(!el)return;
+  const m=ovSelM||nowM();
+  const p=pMD(m),rt=rtMD(m);
+  const net=p.inc-p.total-rt.total;
+  const bud=st.budgets||{};
+  function catRow(cat,amt,src,color){
+    const limit=bud[cat];
+    const pct=limit?Math.min(100,Math.round(amt/limit*100)):null;
+    const over=limit&&amt>limit;
+    return`<div onclick="openOvCatDetail('${m}','${cat.replace(/'/g,"&#39;")}','${src}')" style="display:flex;align-items:center;gap:8px;padding:7px 4px 7px 12px;border-bottom:1px solid var(--rowborder);cursor:pointer;border-radius:8px" onmouseover="this.style.background='var(--hover)'" onmouseout="this.style.background=''">
+      <div style="font-size:1.1rem">${anyIco(cat)}</div>
+      <div style="flex:1;font-size:.82rem;color:var(--sub)">${cat}</div>
+      ${limit?`<div style="font-size:.68rem;color:${over?'#ef4444':'#16a34a'};font-weight:700">${pct}%</div>`:''}
+      <div style="font-weight:700;color:${over?'#ef4444':color};font-size:.85rem">${fmtF(amt)}</div>
+      <div style="color:#bbb;font-size:.7rem">›</div>
+    </div>`;
+  }
+  const pCats=Object.entries(p.cats).filter(([,v])=>v>0).sort((a,b)=>b[1]-a[1]);
+  const rtCats=Object.entries(rt.cats).filter(([,v])=>v>0).sort((a,b)=>b[1]-a[1]);
+  let html=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:12px">
+    <div style="background:#f0fdf4;border-radius:10px;padding:10px 14px">
+      <div style="font-size:.7rem;color:#16a34a;font-weight:700">💰 INCOME</div>
+      <div style="font-size:1.05rem;font-weight:900;color:#16a34a">${p.inc>0?fmtF(p.inc):'—'}</div>
+    </div>
+    <div style="background:${net>=0?'#f0fdf4':'#fff1f2'};border-radius:10px;padding:10px 14px">
+      <div style="font-size:.7rem;color:${net>=0?'#16a34a':'#dc2626'};font-weight:700">📊 NET</div>
+      <div style="font-size:1.05rem;font-weight:900;color:${net>=0?'#16a34a':'#dc2626'}">${net>=0?'+':''}${fmtF(net)}</div>
+    </div>
+  </div>`;
+  if(pCats.length){
+    html+=`<div style="font-size:.7rem;font-weight:800;color:#6c63ff;padding:6px 0 4px;letter-spacing:.04em">👤 PRIBADI — ${fmtF(p.total)}</div>`;
+    html+=pCats.map(([c,v])=>catRow(c,v,'p','#6c63ff')).join('');
+  }
+  if(rtCats.length){
+    html+=`<div style="font-size:.7rem;font-weight:800;color:#f59e0b;padding:10px 0 4px;letter-spacing:.04em">🏡 RUMAH TANGGA — ${fmtF(rt.total)}</div>`;
+    html+=rtCats.map(([c,v])=>catRow(c,v,'rt','#f59e0b')).join('');
+  }
+  if(!pCats.length&&!rtCats.length)html+=`<div style="text-align:center;color:#bbb;padding:20px;font-size:.82rem">Belum ada transaksi di ${mN(m)}</div>`;
+  el.innerHTML=html;
+}
+function openOvCatDetail(m,cat,src){
+  const txArr=src==='p'?st.pTx:st.rtTx;
+  const txs=txArr.filter(t=>t.date.slice(0,7)===m&&t.cat===cat).sort((a,b)=>b.date.localeCompare(a.date));
+  const total=txs.reduce((s,t)=>s+t.amt,0);
+  document.getElementById('cc-mod-title').textContent=(src==='p'?'👤':'🏡')+' '+cat;
+  document.getElementById('cc-mod-sub').textContent=mN(m)+' · '+fmtF(total);
+  document.getElementById('cc-mod-txs').innerHTML=txs.length
+    ?`<div style="background:#fef3c7;border-radius:10px;padding:8px 14px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center">
+        <span style="font-size:.82rem;font-weight:700;color:#92400e">Total</span>
+        <span style="font-size:1rem;font-weight:900;color:#d97706">${fmtF(total)}</span>
+      </div>`
+      +txs.map(t=>`<div class="txi">
+        <div class="txico" style="background:#fef3c7">${anyIco(t.cat||'')}</div>
+        <div class="txinfo"><div class="txd">${t.desc}</div><div class="txm">${t.date}${t.pay?' · '+t.pay:''}</div></div>
+        <div style="display:flex;align-items:center;gap:3px">
+          <div class="txa">${fmtF(t.amt)}</div>
+          <button class="dbtn" onclick="closeCCMod();openEM('${t.id}','${src}')">✏️</button>
+        </div>
+      </div>`).join('')
+    :`<div class="empty"><div class="ei">📭</div><p>Tidak ada transaksi</p></div>`;
+  document.getElementById('cc-mod-pay-section').innerHTML='';
+  document.getElementById('ccmod').classList.add('open');
+}
 function rOV(){
   const ms=allM();
   let tInc=0,tP=0,tRT=0,sur=0,def=0;
