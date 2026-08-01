@@ -1200,8 +1200,7 @@ function restPoll(){
     const rem=JSON.stringify(data),loc=JSON.stringify(st);
     if(rem===loc)return;
     if(remoteTotal>localTxCount()){
-      // Remote has more tx (local deletion not yet synced) — sync settings only, keep local tx
-      st={...DEF,...data,pTx:st.pTx,rtTx:st.rtTx};
+      st={...DEF,...data,pTx:st.pTx,rtTx:st.rtTx,acc:st.acc,savH:st.savH};
     }else{
       st={...DEF,...data};
     }
