@@ -3313,7 +3313,7 @@ function rPayMethods(){
     <div class="cat-item">
       <div class="cat-ico-lbl">${m.startsWith('CC')?'💳':m.startsWith('Transfer')?'🏦':'💵'}</div>
       <div class="cat-name-lbl" style="flex:1">${m}</div>
-      ${i<DEF_PAYMETHODS.length?`<span style="font-size:.68rem;color:#bbb;padding:2px 7px;background:#f5f5f5;border-radius:10px">default</span>`:`<button class="cat-act-btn" onclick="delPayMethod(${i})" title="Hapus">🗑</button>`}
+      ${DEF_PAYMETHODS.includes(m)||getCCards().map(c=>c.name).includes(m)?`<span style="font-size:.68rem;color:#bbb;padding:2px 7px;background:#f5f5f5;border-radius:10px">default</span>`:`<button class="cat-act-btn" onclick="delPayMethod('${m.replace(/'/g,"\\'")}')" title="Hapus">🗑</button>`}
     </div>`).join('');
 }
 function addPayMethod(){
@@ -3325,10 +3325,10 @@ function addPayMethod(){
   st.payMethods.push(val);save();inp.value='';
   rPayMethods();refreshCatDropdowns();showT('✅ Ditambahkan!');
 }
-function delPayMethod(idx){
+function delPayMethod(name){
   if(!st.payMethods)st.payMethods=[...DEF_PAYMETHODS];
-  if(idx<DEF_PAYMETHODS.length){showT('⚠️ Tidak bisa hapus metode default');return}
-  st.payMethods.splice(idx,1);save();
+  if(DEF_PAYMETHODS.includes(name)||getCCards().map(c=>c.name).includes(name)){showT('⚠️ Tidak bisa hapus metode default');return}
+  st.payMethods=st.payMethods.filter(m=>m!==name);save();
   rPayMethods();refreshCatDropdowns();showT('🗑 Dihapus');
 }
 
