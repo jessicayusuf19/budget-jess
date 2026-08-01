@@ -924,7 +924,14 @@ textarea{resize:vertical;min-height:100px;line-height:1.5}
   <div class="modal">
     <h3 id="goalmod-t">🎯 Tambah Goal</h3>
     <div class="frow">
-      <div class="fld"><label>Emoji / Ikon</label><input type="text" id="goal-ico" placeholder="✈️" style="font-size:1.4rem;text-align:center"></div>
+      <div class="fld">
+        <label>Emoji / Ikon</label>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px" id="goal-ico-grid"></div>
+        <div style="margin-top:6px;display:flex;align-items:center;gap:8px">
+          <span style="font-size:.75rem;color:#999">Atau ketik:</span>
+          <input type="text" id="goal-ico" placeholder="✈️" maxlength="4" style="width:54px;font-size:1.2rem;text-align:center;padding:4px;border:2px solid #e8e8f0;border-radius:8px">
+        </div>
+      </div>
       <div class="fld" style="flex:3"><label>Nama Goal</label><input type="text" id="goal-name" placeholder="Liburan Eropa, Beli Mobil..."></div>
     </div>
     <div class="frow">
