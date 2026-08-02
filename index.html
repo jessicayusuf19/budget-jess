@@ -1318,10 +1318,9 @@ function autoBackup(){
   }catch(e){}
 }
 function save(){
+  _skipPollUntil=Date.now()+5000;
   localStorage.setItem('jb_v5',JSON.stringify(st));
   autoBackup();
-  // Guard: never push to Firebase if local has fewer transactions than Firebase max seen
-  // guard removed — restPoll handles pull direction
   if(fbConnected&&fbRef){setSyncStatus('syncing');fbRef.set(st).then(()=>setSyncStatus('connected')).catch(e=>{setSyncStatus('error');restPush();setSyncStatus('connected');});}
   else{restPush();setSyncStatus('connected');}
 }
