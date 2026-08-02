@@ -1277,7 +1277,7 @@ function initFirebase(cfg){
         if(remoteTotal>=localTotal){
           if(remoteStr!==localStr){st={...DEF,...data};if(!st.xi)st.xi={};if(!st.budgets)st.budgets={};runMigrations();localStorage.setItem('jb_v5',JSON.stringify(st));autoBackup();rerenderCurrent();}
         } else {
-          const merged={...DEF,...data,pTx:st.pTx,rtTx:st.rtTx,acc:st.acc,savH:st.savH};
+          const merged={...DEF,...data,pTx:st.pTx,rtTx:st.rtTx,acc:st.acc,savH:st.savH,budgets:st.budgets,pcats:st.pcats,rtcats:st.rtcats,payMethods:st.payMethods,reminders:st.reminders,goals:st.goals,ccards:st.ccards,xi:st.xi};
           const mergedStr=JSON.stringify(merged);
           if(mergedStr!==localStr){st=merged;if(!st.xi)st.xi={};if(!st.budgets)st.budgets={};runMigrations();localStorage.setItem('jb_v5',mergedStr);autoBackup();rerenderCurrent();}
         }
