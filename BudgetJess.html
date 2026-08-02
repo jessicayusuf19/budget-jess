@@ -1212,11 +1212,11 @@ function restPoll(){
     if(rem===loc)return;
     if(remoteTotal>localTxCount()){
       st={...DEF,...data,pTx:st.pTx,rtTx:st.rtTx,acc:st.acc,savH:st.savH};
+      if(!st.xi)st.xi={};if(!st.budgets)st.budgets={};if(!st.ccards){const cb=st.ccbilling||{};st.ccards=[{key:'cimb',name:'CC CIMB',day:cb.cimb||21},{key:'bca',name:'CC BCA',day:cb.bca||17},{key:'uob',name:'CC UOB',day:cb.uob||11}];}
+      runMigrations();localStorage.setItem('jb_v5',JSON.stringify(st));rerenderCurrent();setSyncStatus('connected');
     }else{
-      st={...DEF,...data};
+      restPush();setSyncStatus('connected');
     }
-    if(!st.xi)st.xi={};if(!st.budgets)st.budgets={};if(!st.ccards){const cb=st.ccbilling||{};st.ccards=[{key:'cimb',name:'CC CIMB',day:cb.cimb||21},{key:'bca',name:'CC BCA',day:cb.bca||17},{key:'uob',name:'CC UOB',day:cb.uob||11}];}
-    runMigrations();localStorage.setItem('jb_v5',JSON.stringify(st));rerenderCurrent();setSyncStatus('connected');
   }).catch(()=>{});}
 let _restInterval=null;
 
