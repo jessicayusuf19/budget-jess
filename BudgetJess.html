@@ -1207,6 +1207,7 @@ function restPoll(){
   if(Date.now()<_skipPollUntil)return;
   fetch(fbRestUrl()).then(r=>r.ok?r.json():null).then(data=>{
     if(!data)return;
+    if(Date.now()<_skipPollUntil)return;
     const remoteTotal=(data.pTx?.length||0)+(data.rtTx?.length||0);
     const rem=JSON.stringify(data),loc=JSON.stringify(st);
     if(rem===loc)return;
