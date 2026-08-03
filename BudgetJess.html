@@ -1269,21 +1269,20 @@ function initFirebase(cfg){
     fbRef.on('value',(snap)=>{
       if(Date.now()<_skipPollUntil)return;
       const data=snap.val();
-      const remoteTotal=(data?(data.pTx?data.pTx.length:0)+(data.rtTx?data.rtTx.length:0):0);
+      if(!data){fbRef.set(st);setSyncStatus('connected');return;}
+      const remoteTotal=(data.pTx?.length||0)+(data.rtTx?.length||0);
       const localTotal=localTxCount();
-      const remoteHasData=remoteTotal>0;
-      const localHasData=localTotal>0;
-      if(remoteHasData){
-        const remoteStr=JSON.stringify(data),localStr=JSON.stringify(st);
-        if(remoteTotal>=localTotal){
-          if(remoteStr!==localStr){st={...DEF,...data};if(!st.xi)st.xi={};if(!st.budgets)st.budgets={};runMigrations();localStorage.setItem('jb_v5',JSON.stringify(st));autoBackup();rerenderCurrent();}
-        } else {
-          const merged={...DEF,...data,pTx:st.pTx,rtTx:st.rtTx,acc:st.acc,savH:st.savH,budgets:st.budgets,pcats:st.pcats,rtcats:st.rtcats,payMethods:st.payMethods,reminders:st.reminders,goals:st.goals,ccards:st.ccards,xi:st.xi};
-          const mergedStr=JSON.stringify(merged);
-          if(mergedStr!==localStr){st=merged;if(!st.xi)st.xi={};if(!st.budgets)st.budgets={};runMigrations();localStorage.setItem('jb_v5',mergedStr);autoBackup();rerenderCurrent();}
-        }
-      }else if(localHasData){fbRef.set(st);
-      }else if(!data){fbRef.set(st);}
+      const txIds=d=>[...(d.pTx||[]),...(d.rtTx||[])].map(t=>t.id).sort().join(',');
+      if(remoteTotal>localTotal){
+        st={...DEF,...data};if(!st.xi)st.xi={};if(!st.budgets)st.budgets={};
+        runMigrations();localStorage.setItem('jb_v5',JSON.stringify(st));autoBackup();rerenderCurrent();
+      }else if(remoteTotal===localTotal&&txIds(data)!==txIds(st)){
+        st={...DEF,...data,budgets:st.budgets,pcats:st.pcats,rtcats:st.rtcats,payMethods:st.payMethods,reminders:st.reminders,goals:st.goals,ccards:st.ccards,xi:st.xi};
+        if(!st.xi)st.xi={};if(!st.budgets)st.budgets={};
+        runMigrations();localStorage.setItem('jb_v5',JSON.stringify(st));autoBackup();rerenderCurrent();
+      }else if(remoteTotal<localTotal){
+        restPush();
+      }else if(localTotal===0){fbRef.set(st);}
       setSyncStatus('connected');
     },(err)=>{console.error(err);setSyncStatus('error');fbConnected=false;showT('❌ Gagal: '+err.message)});
   }catch(e){setSyncStatus('error');fbConnected=false;showT('❌ Error: '+e.message);console.error(e)}
