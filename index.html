@@ -1306,11 +1306,10 @@ function rSync(){
   if(fbConnected)setSyncStatus('connected');else setSyncStatus('off');
 }
 
-function autoBackup(){
+function autoBackup(json){
   try{
     const key='jb_v5_backup_'+new Date().toISOString().slice(0,10);
-    localStorage.setItem(key,JSON.stringify(st));
-    // Keep only last 7 daily backups
+    localStorage.setItem(key,json||JSON.stringify(st));
     const backupKeys=Object.keys(localStorage).filter(k=>k.startsWith('jb_v5_backup_')).sort();
     if(backupKeys.length>7)backupKeys.slice(0,backupKeys.length-7).forEach(k=>localStorage.removeItem(k));
     const el=document.getElementById('backup-status');
@@ -1318,9 +1317,11 @@ function autoBackup(){
   }catch(e){}
 }
 function save(){
-  _skipPollUntil=Date.now()+5000;
-  localStorage.setItem('jb_v5',JSON.stringify(st));
-  autoBackup();
+  const skip=Date.now()+5000;
+  if(skip>_skipPollUntil)_skipPollUntil=skip;
+  const json=JSON.stringify(st);
+  localStorage.setItem('jb_v5',json);
+  autoBackup(json);
   if(fbConnected&&fbRef){setSyncStatus('syncing');fbRef.set(st).then(()=>setSyncStatus('connected')).catch(e=>{setSyncStatus('error');restPush();setSyncStatus('connected');});}
   else{restPush();setSyncStatus('connected');}
 }
