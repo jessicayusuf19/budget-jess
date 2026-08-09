@@ -1925,12 +1925,14 @@ function rRT(){
 }
 function selRTM(m){rtM=m;document.querySelectorAll('#rt-chips .mc').forEach(c=>c.classList.toggle('active',c.textContent===mS(m)));rRTD()}
 function rRTD(){
-  const{cats,total}=rtMD(rtM);
+  const{cats,total,incTotal}=rtMD(rtM);
+  const rtNet=incTotal-total;
   document.getElementById('rt-ctitle').textContent=`📊 Rumah Tangga — ${mS(rtM)}`;
   document.getElementById('rt-ttitle').textContent=`🧾 Transaksi — ${mS(rtM)}`;
   const s=Object.entries(cats).sort((a,b)=>b[1]-a[1]).filter(([,v])=>v>0);
   const mx=s[0]?.[1]||1;
-  document.getElementById('rt-cats').innerHTML=s.length?`<div style="font-size:.77rem;color:#999;margin-bottom:12px;font-weight:700">Total: <b style="color:#333">${fmt(total)}</b></div>`+s.map(([c,v])=>{
+  const rtIncBar=incTotal>0?`<div style="background:#f0fdf4;border:1px solid #86efac;border-radius:10px;padding:8px 12px;margin-bottom:10px;font-size:.8rem"><span style="color:#16a34a;font-weight:800">💰 Income RT: ${fmt(incTotal)}</span> &nbsp;|&nbsp; <span style="color:#ef4444;font-weight:700">Keluar: ${fmt(total)}</span> &nbsp;|&nbsp; <span style="font-weight:800;color:${rtNet>=0?'#16a34a':'#ef4444'}">${rtNet>=0?'Sisa':'Kurang'}: ${fmt(Math.abs(rtNet))}</span></div>`:'';
+  document.getElementById('rt-cats').innerHTML=rtIncBar+(s.length?`<div style="font-size:.77rem;color:#999;margin-bottom:12px;font-weight:700">Total: <b style="color:#333">${fmt(total)}</b></div>`+s.map(([c,v])=>{
     const bud=(st.budgets||{})[c];
     const pct=Math.min(100,(v/mx*100)).toFixed(0);
     const budHtml=bud?`<span class="cbud">${fmt(v)}/${fmt(bud)} (${Math.round(v/bud*100)}%)</span>`:'';
