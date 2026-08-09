@@ -3746,8 +3746,6 @@ document.addEventListener('DOMContentLoaded',()=>{
   // Always poll as backup (catches missed real-time events)
   restPoll();
   if(!_restInterval)_restInterval=setInterval(restPoll,30000);
-  {
-  }
   // Also poll on tab focus so data is fresh when user switches back
   document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')restPoll();});
   syncMobNav('overview');
