@@ -3741,10 +3741,12 @@ document.addEventListener('DOMContentLoaded',()=>{
     document.getElementById('fb-key-input')&&(document.getElementById('fb-key-input').value=cfg.syncKey||'');
     initFirebase(cfg);
   }else{
-    // No SDK config — use REST polling as primary sync
-    restPoll();
-    _restInterval=setInterval(restPoll,30000);
     setSyncStatus('connected');
+  }
+  // Always poll as backup (catches missed real-time events)
+  restPoll();
+  if(!_restInterval)_restInterval=setInterval(restPoll,30000);
+  {
   }
   // Also poll on tab focus so data is fresh when user switches back
   document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')restPoll();});
