@@ -1224,9 +1224,13 @@ function restPoll(){
     const localTotal=localTxCount();
     const remoteMod=data._lastModified||0;
     const localMod=st._lastModified||0;
-    // Pull jika remote lebih baru (handles add/edit/delete dari device lain).
-    // Fallback: lebih banyak tx untuk data lama tanpa timestamp.
-    if(remoteMod>localMod||(remoteMod===0&&localMod===0&&remoteTotal>localTotal)){
+    // Kondisi AMAN untuk pull:
+    // 1. Local kosong → selalu pull dari Firebase (fresh browser / localStorage cleared)
+    // 2. Firebase punya lebih banyak tx → pull (device lain tambah transaksi)
+    // 3. Firebase lebih baru DAN tidak berkurang drastis (maks 10 tx lebih sedikit = sync delete wajar)
+    const localEmpty=localTotal===0;
+    const safeDrop=remoteTotal>=localTotal-10;
+    if(localEmpty||remoteTotal>localTotal||(remoteMod>localMod&&safeDrop)){
       st={...DEF,...data};if(!st.xi)st.xi={};if(!st.budgets)st.budgets={};
       if(!st.ccards){const cb=st.ccbilling||{};st.ccards=[{key:'cimb',name:'CC CIMB',day:cb.cimb||21},{key:'bca',name:'CC BCA',day:cb.bca||17},{key:'uob',name:'CC UOB',day:cb.uob||11}];}
       runMigrations();localStorage.setItem('jb_v5',JSON.stringify(st));rerenderCurrent();setSyncStatus('connected');
