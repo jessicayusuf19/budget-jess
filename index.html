@@ -1275,11 +1275,13 @@ function initFirebase(cfg){
       }
       const data=snap.val();
       if(!data){fbRef.set(st);setSyncStatus('connected');return;}
+      const remoteTotal=(data.pTx?.length||0)+(data.rtTx?.length||0);
+      const localTotal=localTxCount();
+      // SAFETY: never overwrite local with Firebase data that has fewer transactions
+      if(remoteTotal<localTotal){setSyncStatus('connected');return;}
       const remoteMod=data._lastModified||0;
       const localMod=st._lastModified||0;
-      const remoteTotal=(data.pTx?.length||0)+(data.rtTx?.length||0);
-      const shouldPull=remoteMod>localMod||(remoteMod===0&&localMod===0&&remoteTotal>localTxCount());
-      if(shouldPull){
+      if(remoteTotal>localTotal||(remoteTotal===localTotal&&remoteMod>localMod)){
         st={...DEF,...data};if(!st.xi)st.xi={};if(!st.budgets)st.budgets={};
         runMigrations();localStorage.setItem('jb_v5',JSON.stringify(st));autoBackup();rerenderCurrent();
       }
