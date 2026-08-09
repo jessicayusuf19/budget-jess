@@ -1331,6 +1331,43 @@ function initFirebase(cfg){
   }catch(e){setSyncStatus('error');fbConnected=false;showT('❌ Error: '+e.message);console.error(e)}
 }
 
+function showEmptyBanner(title,sub,state){
+  const b=document.getElementById('empty-banner');
+  if(!b)return;
+  b.className=state||'';
+  document.getElementById('empty-banner-title').textContent=title;
+  document.getElementById('empty-banner-sub').textContent=sub;
+  document.getElementById('empty-banner-icon').textContent=state==='ok'?'✅':state==='err'?'❌':'⚠️';
+  b.style.display='block';
+}
+function hideEmptyBanner(delay){
+  setTimeout(()=>{
+    const b=document.getElementById('empty-banner');
+    if(b)b.style.display='none';
+  },delay||0);
+}
+function urgentFirebasePull(){
+  // Pull langsung dari Firebase, bypass _skipPollUntil — hanya dipanggil saat localStorage kosong
+  fetch(fbRestUrl()).then(r=>r.ok?r.json():null).then(data=>{
+    if(!data){
+      showEmptyBanner('Tidak ada data di Firebase','Hubungi Jessica atau restore dari file backup','err');
+      return;
+    }
+    const remoteTotal=(data.pTx?.length||0)+(data.rtTx?.length||0);
+    if(remoteTotal===0){
+      showEmptyBanner('Firebase juga kosong','Restore data dari file backup dulu ya','err');
+      return;
+    }
+    st={...DEF,...data};if(!st.xi)st.xi={};if(!st.budgets)st.budgets={};
+    if(!st.ccards){const cb=st.ccbilling||{};st.ccards=[{key:'cimb',name:'CC CIMB',day:cb.cimb||21},{key:'bca',name:'CC BCA',day:cb.bca||17},{key:'uob',name:'CC UOB',day:cb.uob||11}];}
+    runMigrations();localStorage.setItem('jb_v5',JSON.stringify(st));
+    rerenderCurrent();
+    showEmptyBanner('Data berhasil dimuat dari Firebase',remoteTotal+' transaksi tersimpan ✓','ok');
+    hideEmptyBanner(3500);
+  }).catch(()=>{
+    showEmptyBanner('Gagal terhubung ke Firebase','Cek koneksi internet, lalu refresh halaman ini','err');
+  });
+}
 function disconnectFirebase(){
   if(fbRef)fbRef.off();if(fbApp){try{fbApp.delete()}catch{}}
   fbApp=fbDb=fbRef=null;fbConnected=false;localStorage.removeItem('fb_cfg');setSyncStatus('off');showT('🔌 Sync diputus');rSync();
