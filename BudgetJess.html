@@ -1815,11 +1815,15 @@ function openPD(pay,month,src){
 function closePD(){document.getElementById('paydetmod').classList.remove('open');}
 function rPD(){
   const{inc,cats,total}=pMD(pM);
+  const incTxTotal=st.pTx.filter(t=>t.date.slice(0,7)===pM&&t.type==='income').reduce((s,t)=>s+t.amt,0);
+  const showInc=incTxTotal>0?incTxTotal:inc;
+  const net=showInc-total;
   document.getElementById('p-ctitle').textContent=`📊 Pribadi — ${mS(pM)}`;
   document.getElementById('p-ttitle').textContent=`🧾 Transaksi — ${mS(pM)}`;
   const s=Object.entries(cats).sort((a,b)=>b[1]-a[1]).filter(([,v])=>v>0);
   const mx=s[0]?.[1]||1;
-  document.getElementById('p-cats').innerHTML=s.length?`<div style="display:flex;justify-content:space-between;font-size:.77rem;color:#999;margin-bottom:12px;font-weight:700"><span>Total: <b style="color:#333">${fmt(total)}</b></span><span style="color:#22c55e">${fmt(inc)}</span></div>`+s.map(([c,v])=>{
+  const incBar=showInc>0?`<div style="background:#f0fdf4;border:1px solid #86efac;border-radius:10px;padding:8px 12px;margin-bottom:10px;font-size:.8rem"><span style="color:#16a34a;font-weight:800">💰 Income: ${fmt(showInc)}</span>${incTxTotal>0?' <span style="color:#aaa;font-size:.72rem">(tercatat)</span>':' <span style="color:#aaa;font-size:.72rem">(setting)</span>'} &nbsp;|&nbsp; <span style="color:#ef4444;font-weight:700">Keluar: ${fmt(total)}</span> &nbsp;|&nbsp; <span style="font-weight:800;color:${net>=0?'#16a34a':'#ef4444'}">${net>=0?'Sisa':'Kurang'}: ${fmt(Math.abs(net))}</span></div>`:'';
+  document.getElementById('p-cats').innerHTML=incBar+(s.length?`<div style="display:flex;justify-content:space-between;font-size:.77rem;color:#999;margin-bottom:12px;font-weight:700"><span>Total: <b style="color:#333">${fmt(total)}</b></span><span style="color:#22c55e">${fmt(showInc)}</span></div>`+s.map(([c,v])=>{
     const bud=(st.budgets||{})[c];
     const pct=Math.min(100,(v/mx*100)).toFixed(0);
     const budHtml=bud?`<span class="cbud">${fmt(v)}/${fmt(bud)} (${Math.round(v/bud*100)}%)</span>`:'';
