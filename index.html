@@ -1878,6 +1878,12 @@ function savePTx(){
     document.getElementById('p-is-cicilan').checked=false;document.getElementById('p-cicilan-opts').style.display='none';
     showT(`✅ ${n} cicilan tersimpan!`);rPD();rCCBilling();return;
   }
+  if(pType==='income'){
+    st.pTx.unshift({id:Date.now().toString(),date,desc,amt,type:'income',cat:'Income'});
+    save();
+    document.getElementById('p-desc').value='';document.getElementById('p-amt').value='';document.getElementById('p-date').value=today();
+    showT('✅ Income tersimpan!');rPD();return;
+  }
   const t={id:Date.now().toString(),date,desc,amt,type:pType};
   if(pType==='expense'){
     t.cat=document.getElementById('p-cat').value;
