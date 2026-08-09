@@ -1210,11 +1210,14 @@ function restPoll(){
     if(Date.now()<_skipPollUntil)return;
     const remoteMod=data._lastModified||0;
     const localMod=st._lastModified||0;
-    if(remoteMod>localMod){
+    const remoteTotal=(data.pTx?.length||0)+(data.rtTx?.length||0);
+    const shouldPull=remoteMod>localMod||(remoteMod===0&&localMod===0&&remoteTotal>localTxCount());
+    const shouldPush=remoteMod<localMod||(remoteMod===0&&localMod===0&&remoteTotal<localTxCount());
+    if(shouldPull){
       st={...DEF,...data};if(!st.xi)st.xi={};if(!st.budgets)st.budgets={};
       if(!st.ccards){const cb=st.ccbilling||{};st.ccards=[{key:'cimb',name:'CC CIMB',day:cb.cimb||21},{key:'bca',name:'CC BCA',day:cb.bca||17},{key:'uob',name:'CC UOB',day:cb.uob||11}];}
       runMigrations();localStorage.setItem('jb_v5',JSON.stringify(st));rerenderCurrent();setSyncStatus('connected');
-    }else if(remoteMod<localMod){
+    }else if(shouldPush){
       restPush();setSyncStatus('connected');
     }
   }).catch(()=>{});}
