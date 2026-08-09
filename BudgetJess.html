@@ -1329,6 +1329,7 @@ function save(){
   autoBackup(json);
   if(fbConnected&&fbRef){setSyncStatus('syncing');fbRef.set(st).then(()=>setSyncStatus('connected')).catch(e=>{setSyncStatus('error');restPush();setSyncStatus('connected');});}
   else{restPush();setSyncStatus('connected');}
+  setTimeout(()=>{if(Date.now()>=_skipPollUntil)restPoll();},5500);
 }
 let st=load();
 
