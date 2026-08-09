@@ -1317,7 +1317,8 @@ function autoBackup(json){
   }catch(e){}
 }
 function save(){
-  const skip=Date.now()+5000;
+  st._lastModified=Date.now();
+  const skip=st._lastModified+5000;
   if(skip>_skipPollUntil)_skipPollUntil=skip;
   const json=JSON.stringify(st);
   localStorage.setItem('jb_v5',json);
