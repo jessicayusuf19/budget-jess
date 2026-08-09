@@ -159,9 +159,13 @@ tr:last-child td{border-bottom:none}
 .modal h3{font-size:.97rem;font-weight:800;margin-bottom:16px;color:var(--text)}
 
 /* ── TOAST ── */
-#toast{position:fixed;bottom:74px;left:50%;transform:translateX(-50%);background:#1a1a2e;color:#fff;padding:9px 20px;border-radius:20px;font-size:.82rem;font-weight:700;z-index:400;opacity:0;transition:opacity .25s;white-space:nowrap;pointer-events:none}
-#toast.show{opacity:1}
-@media(min-width:641px){#toast{bottom:22px}}
+#toast{position:fixed;bottom:82px;left:50%;transform:translateX(-50%) translateY(16px);background:#1a1a2e;color:#fff;padding:13px 28px;border-radius:16px;font-size:.9rem;font-weight:800;z-index:9999;opacity:0;transition:opacity .22s,transform .22s;white-space:nowrap;pointer-events:none;box-shadow:0 6px 24px rgba(0,0,0,.22);max-width:88vw;text-align:center;letter-spacing:.01em}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+#toast.t-ok{background:#16a34a}
+#toast.t-err{background:#dc2626}
+#toast.t-warn{background:#d97706}
+#toast.t-info{background:#2563eb}
+@media(min-width:641px){#toast{bottom:28px;font-size:.88rem}}
 
 /* ── EMPTY ── */
 .empty{text-align:center;padding:26px 16px;color:var(--empty)}
