@@ -3687,6 +3687,7 @@ function doRestoreJSON(input){
       if(!parsed.pTx)throw new Error('Format tidak valid');
       st={...DEF,...parsed};
       if(!st.xi)st.xi={};if(!st.budgets)st.budgets={};
+      st._lastModified=Date.now();
       runMigrations();
       localStorage.setItem('jb_v5',JSON.stringify(st));
       restPush();
