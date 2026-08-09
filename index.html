@@ -3767,7 +3767,18 @@ function rLapTrend(){
 // ══════════════════════════
 // TOAST
 // ══════════════════════════
-function showT(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2000)}
+function showT(m,dur=2800){
+  const t=document.getElementById('toast');
+  t.className='';
+  if(m.startsWith('✅')||m.startsWith('🗑')||m.startsWith('🔌')||m.startsWith('🔄'))t.classList.add('t-ok');
+  else if(m.startsWith('❌'))t.classList.add('t-err');
+  else if(m.startsWith('⚠️'))t.classList.add('t-warn');
+  else if(m.startsWith('⏳')||m.startsWith('ℹ️'))t.classList.add('t-info');
+  t.textContent=m;
+  clearTimeout(t._tid);
+  t.classList.add('show');
+  t._tid=setTimeout(()=>t.classList.remove('show'),dur);
+}
 
 // ══════════════════════════
 // INIT
