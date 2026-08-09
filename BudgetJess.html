@@ -1277,11 +1277,11 @@ function initFirebase(cfg){
       if(!data){fbRef.set(st);setSyncStatus('connected');return;}
       const remoteTotal=(data.pTx?.length||0)+(data.rtTx?.length||0);
       const localTotal=localTxCount();
-      // SAFETY: never overwrite local with Firebase data that has fewer transactions
-      if(remoteTotal<localTotal){setSyncStatus('connected');return;}
       const remoteMod=data._lastModified||0;
       const localMod=st._lastModified||0;
-      if(remoteTotal>localTotal||(remoteTotal===localTotal&&remoteMod>localMod)){
+      // Pull jika remote lebih baru (handles add/edit/delete dari device lain).
+      // Fallback: lebih banyak tx untuk data lama tanpa timestamp.
+      if(remoteMod>localMod||(remoteMod===0&&localMod===0&&remoteTotal>localTotal)){
         st={...DEF,...data};if(!st.xi)st.xi={};if(!st.budgets)st.budgets={};
         runMigrations();localStorage.setItem('jb_v5',JSON.stringify(st));autoBackup();rerenderCurrent();
       }
