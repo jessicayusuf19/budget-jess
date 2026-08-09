@@ -1269,7 +1269,11 @@ function initFirebase(cfg){
     fbApp=firebase.initializeApp({apiKey:cfg.apiKey,authDomain:cfg.authDomain,databaseURL:cfg.databaseURL,projectId:cfg.projectId,storageBucket:cfg.storageBucket,messagingSenderId:cfg.messagingSenderId,appId:cfg.appId},'budget-'+Date.now());
     fbDb=firebase.database(fbApp);fbRef=fbDb.ref('budget/'+cfg.syncKey);fbConnected=true;
     fbRef.on('value',(snap)=>{
-      if(Date.now()<_skipPollUntil)return;
+      if(Date.now()<_skipPollUntil){
+        const wait=_skipPollUntil-Date.now()+300;
+        setTimeout(()=>{if(Date.now()>=_skipPollUntil)restPoll();},wait);
+        return;
+      }
       const data=snap.val();
       if(!data){fbRef.set(st);setSyncStatus('connected');return;}
       const remoteMod=data._lastModified||0;
