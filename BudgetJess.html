@@ -1750,8 +1750,18 @@ function setPT(t){
   pType=t;
   document.getElementById('pt-e').className='ttb'+(t==='expense'?' ae':'');
   document.getElementById('pt-s').className='ttb'+(t==='saving'?' as':'');
+  document.getElementById('pt-i').className='ttb'+(t==='income'?' ai':'');
   document.getElementById('p-ef').style.display=t==='expense'?'':'none';
   document.getElementById('p-sf').style.display=t==='saving'?'':'none';
+}
+let rtType='expense';
+function setRT(t){
+  rtType=t;
+  document.getElementById('rtt-e').className='ttb'+(t==='expense'?' ae':'');
+  document.getElementById('rtt-i').className='ttb'+(t==='income'?' ai':'');
+  document.getElementById('rt-ef').style.display=t==='expense'?'':'none';
+  document.getElementById('rt-form-title').textContent=t==='income'?'💰 Catat Income RT':'🏡 Catat Pengeluaran Rumah Tangga';
+  document.getElementById('rt-desc').placeholder=t==='income'?'Transfer suami, gaji ART, uang kas...':'Belanja pasar, gas, bayar ART...';
 }
 function rP(){
   refreshCatDropdowns();
