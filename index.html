@@ -1558,8 +1558,9 @@ function pMD(ym){
 }
 function rtMD(ym){
   let cats={};
-  st.rtTx.filter(t=>t.date.slice(0,7)===ym).forEach(t=>{cats[t.cat]=(cats[t.cat]||0)+t.amt});
-  return{cats,total:Object.values(cats).reduce((a,b)=>a+b,0)};
+  st.rtTx.filter(t=>t.date.slice(0,7)===ym&&t.type!=='income').forEach(t=>{cats[t.cat]=(cats[t.cat]||0)+t.amt});
+  const incTotal=st.rtTx.filter(t=>t.date.slice(0,7)===ym&&t.type==='income').reduce((s,t)=>s+t.amt,0);
+  return{cats,total:Object.values(cats).reduce((a,b)=>a+b,0),incTotal};
 }
 
 
