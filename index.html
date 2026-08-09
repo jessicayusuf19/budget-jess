@@ -1662,12 +1662,11 @@ function openOvCatDetail(m,cat,src){
 }
 let _ovLastMod=0,_ovLastSelM='';
 function rOV(){
+  const ms=allM();
+  if(!ovSelM||!ms.includes(ovSelM))ovSelM=nowM();
   const curMod=st._lastModified||0;
   if(curMod===_ovLastMod&&ovSelM===_ovLastSelM)return;
   _ovLastMod=curMod;_ovLastSelM=ovSelM;
-  const ms=allM();
-  // Month chips
-  if(!ovSelM||!ms.includes(ovSelM))ovSelM=nowM();
   const chipEl=document.getElementById('ov-month-chips');
   if(chipEl)chipEl.innerHTML=ms.map(m=>{
     const sel=m===ovSelM;
