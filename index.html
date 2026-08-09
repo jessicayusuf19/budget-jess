@@ -3861,6 +3861,18 @@ document.addEventListener('DOMContentLoaded',()=>{
   document.getElementById('p-date').value=today();
   document.getElementById('rt-date').value=today();
   refreshCatDropdowns();
+
+  // Cek apakah localStorage kosong — kalau ya, langsung pull dari Firebase sebelum render
+  const localIsEmpty=localTxCount()===0&&!localStorage.getItem('jb_v5');
+  if(localIsEmpty){
+    showEmptyBanner(
+      'Data lokal kosong — memuat dari Firebase…',
+      'Ini normal terjadi bila browser clear data-nya. Mohon tunggu sebentar.',
+      ''
+    );
+    urgentFirebasePull();
+  }
+
   const cfg=loadFbConfig();
   if(cfg){
     document.getElementById('fb-key-input')&&(document.getElementById('fb-key-input').value=cfg.syncKey||'');
