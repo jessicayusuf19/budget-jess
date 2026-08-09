@@ -1939,6 +1939,12 @@ function rRTD(){
 function saveRTTx(){
   const date=document.getElementById('rt-date').value,desc=document.getElementById('rt-desc').value.trim(),amt=parseFloat(document.getElementById('rt-amt').value);
   if(!date||!desc||!amt||amt<=0){showT('❌ Isi semua field!');return}
+  if(rtType==='income'){
+    st.rtTx.unshift({id:'rt'+Date.now(),date,desc,amt,type:'income',cat:'Income RT'});
+    save();
+    document.getElementById('rt-desc').value='';document.getElementById('rt-amt').value='';document.getElementById('rt-date').value=today();
+    showT('✅ Income RT tersimpan!');rRTD();return;
+  }
   const isCicilan=document.getElementById('rt-is-cicilan')?.checked;
   if(isCicilan){
     const n=parseInt(document.getElementById('rt-cicilan-n').value)||3;
