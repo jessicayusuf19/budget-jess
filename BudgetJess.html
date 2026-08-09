@@ -2503,7 +2503,11 @@ function saveAN(n){
 // LAPORAN
 // ══════════════════════════
 let lapM=nowM();
+let _lapLastMod=0,_lapLastM='';
 function rLap(){
+  const curMod=st._lastModified||0;
+  if(curMod===_lapLastMod&&lapM===_lapLastM)return;
+  _lapLastMod=curMod;_lapLastM=lapM;
   const ms=allM();
   document.getElementById('lap-chips').innerHTML=ms.map(m=>`<div class="mc${m===lapM?' active':''}" onclick="selLM('${m}')">${mS(m)}</div>`).join('');
   rLapTrend();
