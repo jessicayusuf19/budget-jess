@@ -1270,19 +1270,14 @@ function initFirebase(cfg){
       if(Date.now()<_skipPollUntil)return;
       const data=snap.val();
       if(!data){fbRef.set(st);setSyncStatus('connected');return;}
-      const remoteTotal=(data.pTx?.length||0)+(data.rtTx?.length||0);
-      const localTotal=localTxCount();
-      const txIds=d=>[...(d.pTx||[]),...(d.rtTx||[])].map(t=>t.id).sort().join(',');
-      if(remoteTotal>localTotal){
+      const remoteMod=data._lastModified||0;
+      const localMod=st._lastModified||0;
+      if(remoteMod>localMod){
         st={...DEF,...data};if(!st.xi)st.xi={};if(!st.budgets)st.budgets={};
         runMigrations();localStorage.setItem('jb_v5',JSON.stringify(st));autoBackup();rerenderCurrent();
-      }else if(remoteTotal===localTotal&&txIds(data)!==txIds(st)){
-        st={...DEF,...data,budgets:st.budgets,pcats:st.pcats,rtcats:st.rtcats,payMethods:st.payMethods,reminders:st.reminders,goals:st.goals,ccards:st.ccards,xi:st.xi};
-        if(!st.xi)st.xi={};if(!st.budgets)st.budgets={};
-        runMigrations();localStorage.setItem('jb_v5',JSON.stringify(st));autoBackup();rerenderCurrent();
-      }else if(remoteTotal<localTotal){
-        restPush();
-      }else if(localTotal===0){fbRef.set(st);}
+      }else if(remoteMod<localMod){
+        fbRef.set(st);
+      }
       setSyncStatus('connected');
     },(err)=>{console.error(err);setSyncStatus('error');fbConnected=false;showT('❌ Gagal: '+err.message)});
   }catch(e){setSyncStatus('error');fbConnected=false;showT('❌ Error: '+e.message);console.error(e)}
