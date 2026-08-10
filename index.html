@@ -2065,7 +2065,8 @@ function askD(id,src){pD=id;pS=src;document.getElementById('dmod').classList.add
 function closeDM(){document.getElementById('dmod').classList.remove('open');pD=pS=null}
 function confirmDel(){
   if(!pD)return;
-  if(pS==='p'){
+  const src=pS; // simpan sebelum closeDM() clear pS
+  if(src==='p'){
     const t=st.pTx.find(x=>x.id===pD);
     if(t?.type==='saving'&&t.dest)st.acc[t.dest].balance=Math.max(0,(st.acc[t.dest].balance||0)-t.amt);
     if(t?.type==='expense')reverseAcc(t.pay,t.amt,t);
@@ -2075,7 +2076,13 @@ function confirmDel(){
     if(t)reverseAcc(t.pay,t.amt,t);
     st.rtTx=st.rtTx.filter(x=>x.id!==pD);
   }
-  fbMaxTxCount=localTxCount();_skipPollUntil=Date.now()+10000;save();closeDM();if(pS==='p')rPD();else rRTD();rSavBals();showT('🗑 Dihapus');
+  fbMaxTxCount=localTxCount();
+  _skipPollUntil=Date.now()+10000;
+  save();
+  closeDM();
+  if(src==='p')rPD();else rRTD();
+  rSavBals();
+  showT('✅ Transaksi dihapus!');
 }
 
 // ══════════════════════════
