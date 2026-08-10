@@ -855,11 +855,16 @@ textarea{resize:vertical;min-height:100px;line-height:1.5}
 <!-- DELETE MODAL -->
 <div class="mover" id="dmod">
   <div class="modal">
-    <h3>Hapus transaksi ini?</h3>
-    <p style="color:#666;font-size:.87rem;margin-bottom:18px">Transaksi akan dihapus permanen.</p>
+    <div style="font-size:2rem;text-align:center;margin-bottom:6px">🗑️</div>
+    <h3 style="text-align:center;margin-bottom:8px">Hapus transaksi?</h3>
+    <div id="dmod-preview" style="background:#fff3f3;border:1.5px solid #fca5a5;border-radius:12px;padding:12px 14px;margin-bottom:16px;display:none">
+      <div id="dmod-desc" style="font-weight:800;font-size:.95rem;color:#1a1a2e;margin-bottom:2px"></div>
+      <div id="dmod-meta" style="font-size:.8rem;color:#666"></div>
+    </div>
+    <p style="color:#888;font-size:.84rem;margin-bottom:18px;text-align:center">Transaksi ini akan dihapus permanen dan tidak bisa dikembalikan.</p>
     <div style="display:flex;gap:10px">
       <button class="btn bw" onclick="closeDM()" style="flex:1">Batal</button>
-      <button class="btn br" onclick="confirmDel()" style="flex:1">Hapus</button>
+      <button class="btn br" onclick="confirmDel()" style="flex:1;font-weight:900">🗑️ Hapus</button>
     </div>
   </div>
 </div>
