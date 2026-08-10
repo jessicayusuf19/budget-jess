@@ -2066,7 +2066,19 @@ function txH(t,src){
 // DELETE
 // ══════════════════════════
 let pD=null,pS=null;
-function askD(id,src){pD=id;pS=src;document.getElementById('dmod').classList.add('open')}
+function askD(id,src){
+  pD=id;pS=src;
+  // Isi preview transaksi yang akan dihapus
+  const tx=(src==='p'?st.pTx:st.rtTx).find(x=>x.id===id);
+  const prev=document.getElementById('dmod-preview');
+  if(tx&&prev){
+    document.getElementById('dmod-desc').textContent=tx.desc||'(tanpa nama)';
+    const sign=tx.type==='income'?'+':'-';
+    document.getElementById('dmod-meta').textContent=tx.date+' · '+sign+fmt(tx.amt).replace('Rp ','Rp')+(tx.cat?' · '+tx.cat:'');
+    prev.style.display='block';
+  }else if(prev){prev.style.display='none';}
+  document.getElementById('dmod').classList.add('open');
+}
 function closeDM(){document.getElementById('dmod').classList.remove('open');pD=pS=null}
 function confirmDel(){
   if(!pD)return;
