@@ -1600,7 +1600,9 @@ function runMigrations(){
 }
 
 runMigrations();
-save();
+// ⛔ JANGAN panggil save() di sini — kalau localStorage kosong, save() akan push
+// state kosong ke Firebase dan menghapus semua data HP. Simpan lokal saja.
+{const _j=JSON.stringify(st);localStorage.setItem('jb_v5',_j);try{autoBackup(_j)}catch{}};
 
 // ══════════════════════════
 // UTILS
