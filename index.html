@@ -1380,6 +1380,33 @@ function urgentFirebasePull(){
     showEmptyBanner('Gagal terhubung ke Firebase','Cek koneksi internet, lalu refresh halaman ini','err');
   });
 }
+function updateSyncDiag(){
+  const local=document.getElementById('diag-local');
+  const remote=document.getElementById('diag-remote');
+  if(!local||!remote)return;
+  const lTotal=localTxCount();
+  const lMod=st._lastModified?new Date(st._lastModified).toLocaleString('id-ID'):'belum pernah disimpan';
+  local.textContent=lTotal+' transaksi · terakhir: '+lMod;
+  remote.textContent='⏳ sedang cek…';
+  fetch(fbRestUrl()).then(r=>r.ok?r.json():null).then(data=>{
+    if(!data){remote.innerHTML='<span style="color:#dc2626">❌ Tidak ada data di Firebase</span>';return;}
+    const rTotal=(data.pTx?.length||0)+(data.rtTx?.length||0);
+    const rMod=data._lastModified?new Date(data._lastModified).toLocaleString('id-ID'):'tidak ada timestamp';
+    const ok=rTotal>=lTotal-2;
+    remote.innerHTML=`<span style="color:${ok?'#16a34a':'#dc2626'}">${rTotal} transaksi · terakhir: ${rMod}</span>`;
+  }).catch(()=>{remote.innerHTML='<span style="color:#dc2626">❌ Gagal terhubung</span>';});
+}
+function forcePushFirebase(){
+  if(!confirm('Kirim data dari DEVICE INI ke Firebase?\n\nPastikan data di device ini sudah benar sebelum melanjutkan.'))return;
+  showT('⏳ Mengirim data ke Firebase…',4000);
+  fetch(fbRestUrl(),{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(st)})
+    .then(r=>{
+      if(!r.ok)throw new Error('HTTP '+r.status);
+      showT('✅ Data berhasil dikirim ke Firebase! ('+localTxCount()+' transaksi)',3500);
+      updateSyncDiag();
+    })
+    .catch(e=>showT('❌ Gagal kirim: '+e.message));
+}
 function disconnectFirebase(){
   if(fbRef)fbRef.off();if(fbApp){try{fbApp.delete()}catch{}}
   fbApp=fbDb=fbRef=null;fbConnected=false;localStorage.removeItem('fb_cfg');setSyncStatus('off');showT('🔌 Sync diputus');rSync();
