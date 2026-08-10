@@ -2663,6 +2663,7 @@ function rLapD(){
 // PENGATURAN
 // ══════════════════════════
 function rSettings(){
+  updateSyncDiag();
   // Kategori Pribadi
   const pcats=getPcats();
   document.getElementById('set-pcats').innerHTML=pcats.length?pcats.map((c,i)=>`
