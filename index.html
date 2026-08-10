@@ -666,9 +666,16 @@ textarea{resize:vertical;min-height:100px;line-height:1.5}
 
     <!-- Ambil dari HP -->
     <div class="card" style="border:2px solid #bfdbfe;background:#eff6ff">
-      <h3>📱 Ambil Data dari HP</h3>
-      <p style="font-size:.79rem;color:#1e40af;margin-bottom:12px;line-height:1.5">Ambil data terbaru dari Firebase langsung ke website ini.</p>
-      <button class="btn" onclick="forcePullFirebase()" style="background:#3b82f6;color:#fff;font-weight:800;width:100%">📥 Ambil Data Terbaru dari HP (Firebase)</button>
+      <h3>🔄 Sinkronisasi Data</h3>
+      <div id="sync-diag" style="background:#fff;border-radius:10px;padding:12px 14px;margin-bottom:12px;font-size:.82rem;line-height:1.7;color:#374151">
+        <div>📱 <b>Device ini:</b> <span id="diag-local">Mengecek…</span></div>
+        <div>☁️ <b>Firebase:</b> <span id="diag-remote">Mengecek…</span></div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn" onclick="forcePullFirebase()" style="background:#3b82f6;color:#fff;font-weight:800;flex:1;min-width:140px">📥 Ambil dari Firebase</button>
+        <button class="btn" onclick="forcePushFirebase()" style="background:#7c3aed;color:#fff;font-weight:800;flex:1;min-width:140px">📤 Kirim ke Firebase</button>
+      </div>
+      <p style="font-size:.74rem;color:#6b7280;margin-top:8px;line-height:1.5">📥 Ambil = laptop ambil data dari HP.<br>📤 Kirim = device ini kirim data ke Firebase (lakukan di HP kalau HP yang punya data lengkap).</p>
     </div>
 
     <!-- Sinkronisasi Saldo -->
