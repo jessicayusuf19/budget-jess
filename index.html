@@ -159,13 +159,13 @@ tr:last-child td{border-bottom:none}
 .modal h3{font-size:.97rem;font-weight:800;margin-bottom:16px;color:var(--text)}
 
 /* ── TOAST ── */
-#toast{position:fixed;bottom:82px;left:50%;transform:translateX(-50%) translateY(16px);background:#1a1a2e;color:#fff;padding:13px 28px;border-radius:16px;font-size:.9rem;font-weight:800;z-index:9999;opacity:0;transition:opacity .22s,transform .22s;white-space:nowrap;pointer-events:none;box-shadow:0 6px 24px rgba(0,0,0,.22);max-width:88vw;text-align:center;letter-spacing:.01em}
+#toast{position:fixed;bottom:calc(72px + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%) translateY(20px);background:#1a1a2e;color:#fff;padding:14px 28px;border-radius:16px;font-size:.93rem;font-weight:800;z-index:9999;opacity:0;transition:opacity .25s,transform .25s;white-space:nowrap;pointer-events:none;box-shadow:0 8px 28px rgba(0,0,0,.28);max-width:90vw;text-align:center;letter-spacing:.01em}
 #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 #toast.t-ok{background:#16a34a}
 #toast.t-err{background:#dc2626}
 #toast.t-warn{background:#d97706}
 #toast.t-info{background:#2563eb}
-@media(min-width:641px){#toast{bottom:28px;font-size:.88rem}}
+@media(min-width:641px){#toast{bottom:32px;font-size:.88rem}}
 #empty-banner{position:fixed;top:0;left:0;right:0;z-index:9998;animation:bannerSlide .3s ease}
 @keyframes bannerSlide{from{transform:translateY(-100%)}to{transform:translateY(0)}}
 #empty-banner-inner{display:flex;align-items:center;gap:12px;padding:12px 18px;background:#92400e;color:#fff}
