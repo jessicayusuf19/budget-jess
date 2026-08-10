@@ -3902,15 +3902,28 @@ function rLapTrend(){
 // ══════════════════════════
 function showT(m,dur=3200){
   const t=document.getElementById('toast');
-  t.className='';
-  if(m.startsWith('✅')||m.startsWith('🔌')||m.startsWith('🔄'))t.classList.add('t-ok');
-  else if(m.startsWith('❌'))t.classList.add('t-err');
-  else if(m.startsWith('⚠️'))t.classList.add('t-warn');
-  else if(m.startsWith('⏳')||m.startsWith('ℹ️'))t.classList.add('t-info');
-  t.textContent=m;
+  if(!t)return;
   clearTimeout(t._tid);
-  t.classList.add('show');
-  t._tid=setTimeout(()=>t.classList.remove('show'),dur);
+  // warna berdasarkan awalan pesan
+  let bg='#1a1a2e';
+  if(m.startsWith('✅')||m.startsWith('🔌')||m.startsWith('🔄'))bg='#16a34a';
+  else if(m.startsWith('❌'))bg='#dc2626';
+  else if(m.startsWith('⚠️'))bg='#d97706';
+  else if(m.startsWith('⏳')||m.startsWith('ℹ️'))bg='#2563eb';
+  t.textContent=m;
+  t.style.background=bg;
+  // paksa reflow agar transisi berjalan dari awal
+  t.style.transition='none';
+  t.style.opacity='0';
+  t.style.transform='translateX(-50%) translateY(20px)';
+  t.offsetHeight; // trigger reflow
+  t.style.transition='opacity .25s, transform .25s';
+  t.style.opacity='1';
+  t.style.transform='translateX(-50%) translateY(0)';
+  t._tid=setTimeout(()=>{
+    t.style.opacity='0';
+    t.style.transform='translateX(-50%) translateY(20px)';
+  },dur);
 }
 
 // ══════════════════════════
