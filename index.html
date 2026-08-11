@@ -611,8 +611,10 @@ textarea{resize:vertical;min-height:100px;line-height:1.5}
       <div style="display:flex;gap:8px;flex-wrap:wrap">
         <button class="btn" onclick="backupJSON()" style="background:#22c55e;color:#fff;border:none;padding:10px 18px;border-radius:10px;font-weight:700;cursor:pointer">💾 Download Backup Sekarang</button>
         <button class="btn" onclick="restoreJSON()" style="background:#f59e0b;color:#fff;border:none;padding:10px 18px;border-radius:10px;font-weight:700;cursor:pointer">📂 Restore dari File</button>
+        <button class="btn" onclick="scanLocalBackups()" style="background:#6366f1;color:#fff;border:none;padding:10px 18px;border-radius:10px;font-weight:700;cursor:pointer">🔍 Cek Backup Lama di Browser</button>
       </div>
-      <p style="font-size:.75rem;color:#666;margin-top:10px;margin-bottom:0">Auto-backup tersimpan di browser. Klik "Download Backup" secara rutin dan simpan di Google Drive.</p>
+      <div id="local-backups-list" style="margin-top:12px;display:none"></div>
+      <p style="font-size:.75rem;color:#666;margin-top:10px;margin-bottom:0">Auto-backup tersimpan di browser (7 hari terakhir). Gunakan "Cek Backup Lama" untuk recover data yang hilang.</p>
     </div>
 
     <!-- Payment Methods -->
