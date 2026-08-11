@@ -1398,21 +1398,32 @@ function urgentFirebasePull(){
   });
 }
 function updateSyncDiag(){
-  const local=document.getElementById('diag-local');
-  const remote=document.getElementById('diag-remote');
-  if(!local||!remote)return;
-  const lTotal=localTxCount();
-  const lMod=st._lastModified?new Date(st._lastModified).toLocaleString('id-ID'):'belum pernah disimpan';
-  local.textContent=lTotal+' transaksi · terakhir: '+lMod;
-  remote.textContent='⏳ sedang cek…';
-  fetch(fbRestUrl()).then(r=>r.ok?r.json():null).then(data=>{
-    if(!data){remote.innerHTML='<span style="color:#dc2626">❌ Tidak ada data di Firebase</span>';return;}
-    const rTotal=(data.pTx?.length||0)+(data.rtTx?.length||0);
-    const rMod=data._lastModified?new Date(data._lastModified).toLocaleString('id-ID'):'tidak ada timestamp';
-    const ok=rTotal>=lTotal-2;
-    remote.innerHTML=`<span style="color:${ok?'#16a34a':'#dc2626'}">${rTotal} transaksi · terakhir: ${rMod}</span>`;
-  }).catch(()=>{remote.innerHTML='<span style="color:#dc2626">❌ Gagal terhubung</span>';});
+  // Update both Settings and Sync tab diagnostics
+  const ids=[['diag-local','diag-remote'],['diag-local-main','diag-remote-main']];
+  const lp=st.pTx?.length||0,lrt=st.rtTx?.length||0,lTotal=lp+lrt;
+  const lMod=st._lastModified?new Date(st._lastModified).toLocaleString('id-ID'):'—';
+  ids.forEach(([lid,rid])=>{
+    const l=document.getElementById(lid),r=document.getElementById(rid);
+    if(l)l.innerHTML=`<b>${lTotal} tx</b> (Pribadi: ${lp}, RT: ${lrt}) · simpan: ${lMod}`;
+    if(r){r.textContent='⏳ sedang cek Firebase…';r.style.color='#6b7280';}
+  });
+  fetch(fbRestUrl()).then(res=>res.ok?res.json():null).then(data=>{
+    let html;
+    if(!data||(!data.pTx&&!data.rtTx)){
+      html='<span style="color:#dc2626;font-weight:800">❌ Firebase KOSONG — push dari HP dulu!</span>';
+    }else{
+      const rp=data.pTx?.length||0,rrt=data.rtTx?.length||0,rTotal=rp+rrt;
+      const rMod=data._lastModified?new Date(data._lastModified).toLocaleString('id-ID'):'—';
+      const ok=rTotal>=lTotal-2;
+      html=`<span style="color:${ok?'#16a34a':'#dc2626'};font-weight:800">${ok?'✅':'⚠️'} ${rTotal} tx (Pribadi: ${rp}, RT: ${rrt}) · simpan: ${rMod}</span>`;
+    }
+    ids.forEach(([,rid])=>{const r=document.getElementById(rid);if(r)r.innerHTML=html;});
+  }).catch(()=>{
+    const err='<span style="color:#dc2626">❌ Gagal terhubung ke Firebase</span>';
+    ids.forEach(([,rid])=>{const r=document.getElementById(rid);if(r)r.innerHTML=err;});
+  });
 }
+function checkSyncStatus(){updateSyncDiag();showT('ℹ️ Mengecek status Firebase…',2000);}
 function forcePushFirebase(){
   if(!confirm('Kirim data dari DEVICE INI ke Firebase?\n\nPastikan data di device ini sudah benar sebelum melanjutkan.'))return;
   showT('⏳ Mengirim data ke Firebase…',4000);
