@@ -1451,6 +1451,7 @@ function rSync(){
   const inp=document.getElementById('fb-config-input'),keyInp=document.getElementById('fb-key-input');
   if(cfg&&inp){inp.value='[Config tersimpan — terhubung ke '+cfg.databaseURL+']';if(keyInp)keyInp.value=cfg.syncKey||'';}
   if(fbConnected)setSyncStatus('connected');else setSyncStatus('off');
+  updateSyncDiag(); // auto-cek status setiap kali tab Sync dibuka
 }
 
 function autoBackup(json){
