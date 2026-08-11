@@ -3885,6 +3885,47 @@ function exportAllCSV(){
 function exportPDF(){
   window.print();
 }
+function scanLocalBackups(){
+  const el=document.getElementById('local-backups-list');
+  if(!el)return;
+  const keys=Object.keys(localStorage).filter(k=>k.startsWith('jb_v5_backup_')||k==='jb_v5').sort().reverse();
+  if(!keys.length){el.innerHTML='<p style="color:#dc2626;font-size:.83rem">❌ Tidak ada backup ditemukan di browser ini.</p>';el.style.display='block';return;}
+  const rows=keys.map(k=>{
+    try{
+      const d=JSON.parse(localStorage.getItem(k)||'{}');
+      const p=d.pTx?.length||0,r=d.rtTx?.length||0,total=p+r;
+      const mod=d._lastModified?new Date(d._lastModified).toLocaleString('id-ID'):'—';
+      const label=k==='jb_v5'?'💾 Data aktif sekarang':('📦 Backup '+k.replace('jb_v5_backup_',''));
+      const hasRT=r>0;
+      return`<div style="display:flex;align-items:center;justify-content:space-between;padding:9px 12px;border-radius:8px;margin-bottom:6px;background:${hasRT?'#f0fdf4':'#fff'};border:1px solid ${hasRT?'#86efac':'#e5e7eb'}">
+        <div>
+          <div style="font-weight:800;font-size:.85rem">${label} ${hasRT?'<span style="color:#16a34a">✅ Ada RT!</span>':''}</div>
+          <div style="font-size:.75rem;color:#6b7280">${total} tx (Pribadi: ${p}, RT: ${r}) · ${mod}</div>
+        </div>
+        ${k!=='jb_v5'&&total>0?`<button onclick="restoreFromLocalBackup('${k}')" style="background:#6366f1;color:#fff;border:none;padding:6px 14px;border-radius:8px;font-size:.8rem;font-weight:800;cursor:pointer">Restore</button>`:''}
+      </div>`;
+    }catch{return'';}
+  }).join('');
+  el.innerHTML='<div style="font-weight:800;font-size:.85rem;margin-bottom:8px;color:#374151">Backup tersimpan di browser ini:</div>'+rows;
+  el.style.display='block';
+}
+function restoreFromLocalBackup(key){
+  if(!confirm('Restore data dari backup '+key.replace('jb_v5_backup_','')+'?\n\nData saat ini akan digantikan.'))return;
+  try{
+    const d=JSON.parse(localStorage.getItem(key)||'{}');
+    if(!d.pTx)throw new Error('backup kosong');
+    st={...DEF,...d};
+    if(!st.xi)st.xi={};if(!st.budgets)st.budgets={};
+    st._lastModified=Date.now();
+    runMigrations();
+    const json=JSON.stringify(st);
+    localStorage.setItem('jb_v5',json);
+    _ovLastMod=0;_ovLastSelM='';_lapLastMod=0;_lapLastM='';
+    rerenderCurrent();rOV();
+    showT('✅ Restored! '+(st.pTx.length+st.rtTx.length)+' tx (RT: '+st.rtTx.length+')',4000);
+    scanLocalBackups();
+  }catch(e){showT('❌ Gagal restore: '+e.message);}
+}
 function backupJSON(){
   autoBackup();
   const blob=new Blob([JSON.stringify(st,null,2)],{type:'application/json'});
