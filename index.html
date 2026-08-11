@@ -1484,9 +1484,17 @@ function forcePullFirebase(){
     if(!r.ok)throw new Error('HTTP '+r.status);
     return r.json();
   }).then(data=>{
-    if(!data){showT('❌ Tidak ada data di Firebase!');return;}
-    const remoteTotal=(data.pTx?.length||0)+(data.rtTx?.length||0);
-    if(remoteTotal===0){showT('❌ Firebase kosong — tidak ada transaksi');return;}
+    if(!data||(!data.pTx&&!data.rtTx)){
+      showT('❌ Firebase KOSONG — buka HP dulu, klik 📤 Kirim ke Firebase',5000);
+      updateSyncDiag();
+      return;
+    }
+    const rp=data.pTx?.length||0,rrt=data.rtTx?.length||0,remoteTotal=rp+rrt;
+    if(remoteTotal===0){
+      showT('❌ Firebase kosong — push dari HP dulu!',4000);
+      updateSyncDiag();
+      return;
+    }
     st={...DEF,...data};
     if(!st.xi)st.xi={};
     if(!st.budgets)st.budgets={};
@@ -1496,13 +1504,12 @@ function forcePullFirebase(){
     }
     runMigrations();
     localStorage.setItem('jb_v5',JSON.stringify(st));
-    // Reset render cache biar semua tab re-render ulang dengan data baru
     _ovLastMod=0;_ovLastSelM='';_lapLastMod=0;_lapLastM='';
-    // Reconnect Firebase SDK if config exists
     const cfg=loadFbConfig();if(cfg&&!fbRef)initFirebase(cfg);
     rOV();rPD();rRTD();rSavBals();
-    showT('✅ Berhasil! '+remoteTotal+' transaksi dimuat dari Firebase',3500);
-  }).catch(e=>showT('❌ Gagal: '+e.message+' — cek koneksi internet'));
+    updateSyncDiag();
+    showT('✅ '+remoteTotal+' tx dimuat! (Pribadi: '+rp+', RT: '+rrt+')',4000);
+  }).catch(e=>showT('❌ Gagal: '+e.message,4000));
 }
 function forceResync(){
   if(!confirm('Sinkronkan ulang semua saldo dan transaksi dari biaya rutin? Proses ini akan menghitung ulang dari awal.'))return;
