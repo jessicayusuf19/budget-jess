@@ -728,6 +728,23 @@ textarea{resize:vertical;min-height:100px;line-height:1.5}
     <span id="sync-status-text">Belum terhubung ke cloud</span>
   </div>
 
+  <!-- SYNC DIAGNOSTIC — selalu tampil di atas -->
+  <div class="card" style="border:2px solid #6366f1;background:#eef2ff;margin-bottom:14px">
+    <h3 style="margin-bottom:10px">🔍 Status Data Sekarang</h3>
+    <div id="sync-diag-main" style="background:#fff;border-radius:10px;padding:14px;margin-bottom:12px;font-size:.85rem;line-height:2;color:#374151">
+      <div>📱 <b>Device ini:</b> <span id="diag-local-main" style="color:#6366f1;font-weight:800">klik Cek untuk lihat…</span></div>
+      <div>☁️ <b>Firebase:</b> <span id="diag-remote-main" style="color:#6366f1;font-weight:800">klik Cek untuk lihat…</span></div>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn" onclick="checkSyncStatus()" style="background:#6366f1;color:#fff;font-weight:800;flex:1;min-width:120px">🔍 Cek Status</button>
+      <button class="btn" onclick="forcePullFirebase()" style="background:#3b82f6;color:#fff;font-weight:800;flex:1;min-width:120px">📥 Ambil dari Firebase</button>
+      <button class="btn" onclick="forcePushFirebase()" style="background:#7c3aed;color:#fff;font-weight:800;flex:1;min-width:120px">📤 Kirim ke Firebase</button>
+    </div>
+    <div style="font-size:.74rem;color:#4f46e5;margin-top:10px;line-height:1.6;background:#e0e7ff;border-radius:8px;padding:8px 10px">
+      ⚠️ <b>Jika Firebase lebih sedikit dari Device ini:</b> di HP klik <b>📤 Kirim ke Firebase</b> dulu, baru di laptop klik <b>📥 Ambil dari Firebase</b>.
+    </div>
+  </div>
+
   <div class="cgrid one">
     <div class="card">
       <h3>☁️ Setup Sinkronisasi Firebase (Gratis)</h3>
