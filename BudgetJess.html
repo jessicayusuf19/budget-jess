@@ -2235,7 +2235,7 @@ function moveTxFromEdit(){
     const t=st.pTx.find(x=>x.id===eId);if(!t)return;
     st.pTx=st.pTx.filter(x=>x.id!==eId);
     st.rtTx.unshift(t);
-    save();closeEM();rPD();rRTD();showT('✅ Dipindah ke Rumah Tangga!');
+    save();closeEM();rPD();rRTD();showTd('✅ Dipindah ke Rumah Tangga!');
   } else {
     const t=st.rtTx.find(x=>x.id===eId);if(!t)return;
     st.rtTx=st.rtTx.filter(x=>x.id!==eId);
