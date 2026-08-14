@@ -3979,6 +3979,7 @@ function rLapTrend(){
 // ══════════════════════════
 // TOAST
 // ══════════════════════════
+function showTd(m,dur=3200){setTimeout(()=>showT(m,dur),380);} // delay untuk iOS keyboard dismiss
 function showT(m,dur=3200){
   const t=document.getElementById('toast');
   if(!t)return;
