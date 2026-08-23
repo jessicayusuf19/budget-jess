@@ -1361,20 +1361,23 @@ function initFirebase(cfg){
         return;
       }
       const data=snap.val();
-      if(!data){fbRef.set(st);setSyncStatus('connected');return;}
+      // ⛔ JANGAN push ke Firebase di sini — kalau kosong, tampilkan pesan saja
+      if(!data||(!data.pTx&&!data.rtTx)){setSyncStatus('connected');return;}
       const remoteTotal=(data.pTx?.length||0)+(data.rtTx?.length||0);
       const localTotal=localTxCount();
       const remoteMod=data._lastModified||0;
       const localMod=st._lastModified||0;
-      // Kondisi AMAN untuk pull:
-      // 1. Local kosong → selalu pull dari Firebase (fresh browser / localStorage cleared)
-      // 2. Firebase punya lebih banyak tx → pull (device lain tambah transaksi)
-      // 3. Firebase lebih baru DAN tidak berkurang drastis (maks 10 tx lebih sedikit = sync delete wajar)
+      // Pull jika:
+      // 1. Local kosong → ambil semua dari Firebase
+      // 2. Firebase punya lebih banyak tx → ada tx baru di HP
+      // 3. Firebase lebih baru (timestamp beda) → HP edit/hapus sesuatu
+      //    safeDrop: Firebase boleh punya lebih sedikit tx (HP hapus transaksi), asal tidak drastis (>50)
       const localEmpty=localTotal===0;
-      const safeDrop=remoteTotal>=localTotal-10;
+      const safeDrop=remoteTotal>=localTotal-50;
       if(localEmpty||remoteTotal>localTotal||(remoteMod>localMod&&safeDrop)){
         st={...DEF,...data};if(!st.xi)st.xi={};if(!st.budgets)st.budgets={};
         runMigrations();localStorage.setItem('jb_v5',JSON.stringify(st));autoBackup();rerenderCurrent();
+        showTxNotif('p-notif','🔄 Data diperbarui dari HP!');
       }
       setSyncStatus('connected');
     },(err)=>{console.error(err);setSyncStatus('error');fbConnected=false;showT('❌ Gagal: '+err.message)});
