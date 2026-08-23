@@ -1447,20 +1447,36 @@ function updateSyncDiag(){
 function checkSyncStatus(){updateSyncDiag();showT('ℹ️ Mengecek status Firebase…',2000);}
 function forcePushFirebase(){
   if(!confirm('Kirim data dari DEVICE INI ke Firebase?\n\nPastikan data di device ini sudah benar sebelum melanjutkan.'))return;
-  showT('⏳ Mengirim data ke Firebase…',4000);
-  // Coba Firebase SDK dulu (lebih reliable), fallback ke REST
-  if(fbConnected&&fbRef){
-    fbRef.set(st)
-      .then(()=>{showT('✅ Data berhasil dikirim! ('+localTxCount()+' transaksi)',3500);updateSyncDiag();})
-      .catch(e=>{showT('❌ SDK gagal: '+e.message+'. Coba REST…',3000);_forcePushRest();});
-    return;
-  }
-  _forcePushRest();
+  showT('⏳ Mengirim data ke Firebase…',8000);
+  // Step 1: Test koneksi dulu dengan payload kecil
+  const testUrl=fbRestUrl().replace('.json','/_test.json');
+  fetch(testUrl,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({t:Date.now()})})
+    .then(r=>{
+      if(!r.ok)return r.text().then(t=>{throw new Error('TEST GAGAL HTTP '+r.status+': '+t.substring(0,200));});
+      // Test berhasil — hapus test node lalu push data asli
+      fetch(testUrl,{method:'DELETE'}).catch(()=>{});
+      // Step 2: Coba SDK dulu
+      if(fbConnected&&fbRef){
+        fbRef.set(st)
+          .then(()=>{showT('✅ Data berhasil dikirim! ('+localTxCount()+' transaksi)',5000);updateSyncDiag();})
+          .catch(e=>{
+            alert('❌ SDK gagal: '+e.message+'\n\nAkan coba via REST...');
+            _forcePushRest();
+          });
+        return;
+      }
+      _forcePushRest();
+    })
+    .catch(e=>{
+      // Test gagal = masalah koneksi atau rules Firebase
+      alert('❌ KONEKSI FIREBASE GAGAL\n\n'+e.message+'\n\nURL: '+fbRestUrl()+'\n\nScreenshot pesan ini dan kirim ke Claude.');
+      showT('❌ Koneksi Firebase gagal',5000);
+    });
 }
 function _forcePushRest(){
+  showT('⏳ Mengirim via REST…',8000);
   // Bersihkan data sebelum push — hapus field yg mungkin bikin error
   const payload=JSON.parse(JSON.stringify(st,(k,v)=>{
-    // Hapus nilai undefined/NaN/Infinity
     if(v!==v)return 0; // NaN → 0
     if(v===Infinity||v===-Infinity)return 0;
     return v;
@@ -1468,11 +1484,14 @@ function _forcePushRest(){
   payload._lastModified=Date.now();
   fetch(fbRestUrl(),{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)})
     .then(r=>{
-      if(!r.ok)return r.text().then(t=>{throw new Error('HTTP '+r.status+': '+t.substring(0,80));});
-      showT('✅ Data berhasil dikirim ke Firebase! ('+localTxCount()+' transaksi)',3500);
+      if(!r.ok)return r.text().then(t=>{throw new Error('HTTP '+r.status+': '+t);});
+      showT('✅ Data berhasil dikirim ke Firebase! ('+localTxCount()+' transaksi)',5000);
       updateSyncDiag();
     })
-    .catch(e=>showT('❌ Gagal kirim: '+e.message,6000));
+    .catch(e=>{
+      alert('❌ REST GAGAL\n\n'+e.message+'\n\nScreenshot pesan ini dan kirim ke Claude.');
+      showT('❌ Gagal: '+e.message.substring(0,60),8000);
+    });
 }
 function disconnectFirebase(){
   if(fbRef)fbRef.off();if(fbApp){try{fbApp.delete()}catch{}}
