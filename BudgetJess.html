@@ -2171,7 +2171,8 @@ function confirmDel(){
   _skipPollUntil=Date.now()+10000;
   save();
   closeDM();
-  if(src==='p')rPD();else rRTD();
+  if(src==='p'){rPD();showTxNotif('p-txs','✅ Transaksi dihapus!');}
+  else{rRTD();showTxNotif('rt-txs','✅ Transaksi dihapus!');}
   rSavBals();
   showTd('✅ Transaksi dihapus!');
 }
