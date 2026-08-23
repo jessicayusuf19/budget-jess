@@ -1448,13 +1448,31 @@ function checkSyncStatus(){updateSyncDiag();showT('ℹ️ Mengecek status Fireba
 function forcePushFirebase(){
   if(!confirm('Kirim data dari DEVICE INI ke Firebase?\n\nPastikan data di device ini sudah benar sebelum melanjutkan.'))return;
   showT('⏳ Mengirim data ke Firebase…',4000);
-  fetch(fbRestUrl(),{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(st)})
+  // Coba Firebase SDK dulu (lebih reliable), fallback ke REST
+  if(fbConnected&&fbRef){
+    fbRef.set(st)
+      .then(()=>{showT('✅ Data berhasil dikirim! ('+localTxCount()+' transaksi)',3500);updateSyncDiag();})
+      .catch(e=>{showT('❌ SDK gagal: '+e.message+'. Coba REST…',3000);_forcePushRest();});
+    return;
+  }
+  _forcePushRest();
+}
+function _forcePushRest(){
+  // Bersihkan data sebelum push — hapus field yg mungkin bikin error
+  const payload=JSON.parse(JSON.stringify(st,(k,v)=>{
+    // Hapus nilai undefined/NaN/Infinity
+    if(v!==v)return 0; // NaN → 0
+    if(v===Infinity||v===-Infinity)return 0;
+    return v;
+  }));
+  payload._lastModified=Date.now();
+  fetch(fbRestUrl(),{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)})
     .then(r=>{
-      if(!r.ok)throw new Error('HTTP '+r.status);
+      if(!r.ok)return r.text().then(t=>{throw new Error('HTTP '+r.status+': '+t.substring(0,80));});
       showT('✅ Data berhasil dikirim ke Firebase! ('+localTxCount()+' transaksi)',3500);
       updateSyncDiag();
     })
-    .catch(e=>showT('❌ Gagal kirim: '+e.message));
+    .catch(e=>showT('❌ Gagal kirim: '+e.message,6000));
 }
 function disconnectFirebase(){
   if(fbRef)fbRef.off();if(fbApp){try{fbApp.delete()}catch{}}
