@@ -2034,7 +2034,7 @@ function savePTx(){
     save();
     document.getElementById('p-desc').value='';document.getElementById('p-amt').value='';document.getElementById('p-date').value=today();
     document.getElementById('p-is-cicilan').checked=false;document.getElementById('p-cicilan-opts').style.display='none';
-    showT(`✅ ${n} cicilan tersimpan!`);rPD();rCCBilling();return;
+    showTd(`✅ ${n} cicilan tersimpan!`);showTxNotif('p-txs',`✅ ${n} cicilan tersimpan!`);rPD();rCCBilling();return;
   }
   if(pType==='income'){
     st.pTx.unshift({id:Date.now().toString(),date,desc,amt,type:'income',cat:'Income'});
