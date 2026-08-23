@@ -2040,7 +2040,7 @@ function savePTx(){
     st.pTx.unshift({id:Date.now().toString(),date,desc,amt,type:'income',cat:'Income'});
     save();
     document.getElementById('p-desc').value='';document.getElementById('p-amt').value='';document.getElementById('p-date').value=today();
-    showTd('✅ Income tersimpan!');rPD();return;
+    showTd('✅ Income tersimpan!');showTxNotif('p-txs','✅ Income tersimpan!');rPD();return;
   }
   const t={id:Date.now().toString(),date,desc,amt,type:pType};
   if(pType==='expense'){
