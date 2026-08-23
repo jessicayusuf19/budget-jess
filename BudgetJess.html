@@ -2057,7 +2057,7 @@ function savePTx(){
       t.id='rt'+t.id;
       st.rtTx.unshift(t);save();
       document.getElementById('p-desc').value='';document.getElementById('p-amt').value='';document.getElementById('p-date').value=today();
-      showTd('✅ Tersimpan di Rumah Tangga (Transfer BRI)!');showTxNotif('rt-txs','✅ Tersimpan (Transfer BRI)!');rRTD();rSavBals();return;
+      showTd('✅ Tersimpan di Rumah Tangga (Transfer BRI)!');rRTD();rSavBals();showTxNotif('rt-notif','✅ Tersimpan (Transfer BRI)!');return;
     }
   }else{
     const dest=document.getElementById('p-dest').value;
