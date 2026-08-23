@@ -2120,7 +2120,7 @@ function saveRTTx(){
     save();
     document.getElementById('rt-desc').value='';document.getElementById('rt-amt').value='';document.getElementById('rt-date').value=today();
     document.getElementById('rt-is-cicilan').checked=false;document.getElementById('rt-cicilan-opts').style.display='none';
-    showTd(`✅ ${n} cicilan tersimpan!`);showTxNotif('rt-txs',`✅ ${n} cicilan tersimpan!`);rRTD();rCCBilling();return;
+    showTd(`✅ ${n} cicilan tersimpan!`);rRTD();rCCBilling();showTxNotif('rt-notif',`✅ ${n} cicilan tersimpan!`);return;
   }
   const t={id:'rt'+Date.now(),date,desc,amt,type:'expense',cat:document.getElementById('rt-cat').value,pay:document.getElementById('rt-pay').value};
   deductAcc(t.pay,amt,t);
