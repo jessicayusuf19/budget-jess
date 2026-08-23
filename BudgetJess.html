@@ -2176,8 +2176,8 @@ function confirmDel(){
   _skipPollUntil=Date.now()+10000;
   save();
   closeDM();
-  if(src==='p'){rPD();showTxNotif('p-txs','✅ Transaksi dihapus!');}
-  else{rRTD();showTxNotif('rt-txs','✅ Transaksi dihapus!');}
+  if(src==='p'){rPD();showTxNotif('p-notif','✅ Transaksi dihapus!');}
+  else{rRTD();showTxNotif('rt-notif','✅ Transaksi dihapus!');}
   rSavBals();
   showTd('✅ Transaksi dihapus!');
 }
