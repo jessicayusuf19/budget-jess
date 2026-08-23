@@ -2270,9 +2270,10 @@ function saveEdit(){
     const base={id:eId,date,desc,amt,type:'expense',cat,pay:newPay,_imported:true};
     addCicilanTx(src==='p'?st.pTx:st.rtTx,base,n);
     save();closeEM();
-    if(src==='p')rPD();else rRTD();
+    if(src==='p'){rPD();showTxNotif('p-txs',`✅ Dijadikan ${n} cicilan!`);}
+    else{rRTD();showTxNotif('rt-txs',`✅ Dijadikan ${n} cicilan!`);}
     rCCProjection();
-    showT(`✅ Dijadikan ${n} cicilan!`);
+    showTd(`✅ Dijadikan ${n} cicilan!`);
     return;
   }
   t.date=document.getElementById('e-date').value;
@@ -2281,7 +2282,8 @@ function saveEdit(){
   if(t.type==='expense'){t.cat=document.getElementById('e-cat').value;t.pay=newPay;}
   save();
   closeEM();
-  if(src==='p')rPD();else rRTD();
+  if(src==='p'){rPD();showTxNotif('p-txs','✅ Transaksi diupdate!');}
+  else{rRTD();showTxNotif('rt-txs','✅ Transaksi diupdate!');}
   rSavBals();
   showTd('✅ Transaksi diupdate!');
 }
