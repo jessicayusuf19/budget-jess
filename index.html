@@ -2103,7 +2103,7 @@ function saveRTTx(){
     st.rtTx.unshift({id:'rt'+Date.now(),date,desc,amt,type:'income',cat:'Income RT'});
     save();
     document.getElementById('rt-desc').value='';document.getElementById('rt-amt').value='';document.getElementById('rt-date').value=today();
-    showTd('✅ Income RT tersimpan!');rRTD();return;
+    showTd('✅ Income RT tersimpan!');showTxNotif('rt-txs','✅ Income RT tersimpan!');rRTD();return;
   }
   const isCicilan=document.getElementById('rt-is-cicilan')?.checked;
   if(isCicilan){
