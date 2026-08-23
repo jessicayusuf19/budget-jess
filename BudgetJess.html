@@ -3981,7 +3981,7 @@ function rLapTrend(){
 // ══════════════════════════
 // TOAST
 // ══════════════════════════
-function showTd(m,dur=3200){setTimeout(()=>showT(m,dur),380);} // delay untuk iOS keyboard dismiss
+function showTd(m,dur=3200){setTimeout(()=>showT(m,dur),600);} // delay 600ms - cukup untuk iOS keyboard dismiss
 function showT(m,dur=3200){
   const t=document.getElementById('toast');
   if(!t)return;
@@ -3994,18 +3994,37 @@ function showT(m,dur=3200){
   else if(m.startsWith('⏳')||m.startsWith('ℹ️'))bg='#2563eb';
   t.textContent=m;
   t.style.background=bg;
-  // paksa reflow agar transisi berjalan dari awal
+  // Reset posisi tanpa transisi
   t.style.transition='none';
   t.style.opacity='0';
   t.style.transform='translateX(-50%) translateY(20px)';
-  t.offsetHeight; // trigger reflow
-  t.style.transition='opacity .25s, transform .25s';
-  t.style.opacity='1';
-  t.style.transform='translateX(-50%) translateY(0)';
+  // Double RAF — lebih reliable dari offsetHeight di iOS Safari
+  requestAnimationFrame(()=>{
+    requestAnimationFrame(()=>{
+      t.style.transition='opacity .3s, transform .3s';
+      t.style.opacity='1';
+      t.style.transform='translateX(-50%) translateY(0)';
+    });
+  });
+  // Haptic feedback (Android; no-op di iOS tapi aman)
+  try{if(navigator.vibrate)navigator.vibrate(60);}catch(e){}
   t._tid=setTimeout(()=>{
     t.style.opacity='0';
     t.style.transform='translateX(-50%) translateY(20px)';
   },dur);
+}
+// Notifikasi inline di dalam daftar transaksi — 100% visible, tidak bergantung position:fixed
+function showTxNotif(containerId, msg, isOk=true){
+  const el=document.getElementById(containerId);
+  if(!el)return;
+  // hapus notif lama kalau ada
+  el.querySelectorAll('.tx-notif').forEach(n=>n.remove());
+  const n=document.createElement('div');
+  n.className='tx-notif';
+  n.textContent=msg;
+  if(!isOk)n.style.background='#dc2626';
+  el.prepend(n);
+  setTimeout(()=>{n.style.opacity='0';setTimeout(()=>n.remove(),600);},2800);
 }
 
 // ══════════════════════════
