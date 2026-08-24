@@ -694,8 +694,9 @@ textarea{resize:vertical;min-height:100px;line-height:1.5}
       </div>
       <div style="display:flex;gap:8px;flex-wrap:wrap">
         <button class="btn" onclick="forcePullFirebase()" style="background:#3b82f6;color:#fff;font-weight:800;flex:1;min-width:140px">📥 Ambil dari Firebase</button>
-        <button class="btn" onclick="forcePushFirebase()" style="background:#7c3aed;color:#fff;font-weight:800;flex:1;min-width:140px">📤 Kirim ke Firebase</button>
+        <button class="btn" id="push-btn" onclick="forcePushFirebase()" style="background:#7c3aed;color:#fff;font-weight:800;flex:1;min-width:140px">📤 Kirim ke Firebase</button>
       </div>
+      <div id="push-status" style="display:none;margin-top:10px;padding:12px 14px;border-radius:10px;font-size:.82rem;font-weight:700;line-height:1.6;word-break:break-all"></div>
       <p style="font-size:.74rem;color:#6b7280;margin-top:8px;line-height:1.5">📥 Ambil = laptop ambil data dari HP.<br>📤 Kirim = device ini kirim data ke Firebase (lakukan di HP kalau HP yang punya data lengkap).</p>
     </div>
 
