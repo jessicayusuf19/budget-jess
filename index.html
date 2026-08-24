@@ -1448,14 +1448,14 @@ function updateSyncDiag(){
 }
 function checkSyncStatus(){updateSyncDiag();showT('ℹ️ Mengecek status Firebase…',2000);}
 function _setPushStatus(ok,msg){
-  // Tampilkan status push di banner yang tidak hilang (tidak pakai alert/confirm)
+  // ok=true=hijau, ok=false=merah, ok=null=kuning (loading)
   ['push-status','push-status-main'].forEach(id=>{
     const el=document.getElementById(id);
     if(!el)return;
     el.style.display='block';
-    el.style.background=ok?'#dcfce7':'#fee2e2';
-    el.style.color=ok?'#166534':'#991b1b';
-    el.style.border='2px solid '+(ok?'#86efac':'#fca5a5');
+    if(ok===true){el.style.background='#dcfce7';el.style.color='#166534';el.style.border='2px solid #86efac';}
+    else if(ok===false){el.style.background='#fee2e2';el.style.color='#991b1b';el.style.border='2px solid #fca5a5';}
+    else{el.style.background='#fef9c3';el.style.color='#713f12';el.style.border='2px solid #fde047';}
     el.textContent=msg;
   });
 }
