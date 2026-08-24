@@ -761,8 +761,9 @@ textarea{resize:vertical;min-height:100px;line-height:1.5}
     <div style="display:flex;gap:8px;flex-wrap:wrap">
       <button class="btn" onclick="checkSyncStatus()" style="background:#6366f1;color:#fff;font-weight:800;flex:1;min-width:120px">🔍 Cek Status</button>
       <button class="btn" onclick="forcePullFirebase()" style="background:#3b82f6;color:#fff;font-weight:800;flex:1;min-width:120px">📥 Ambil dari Firebase</button>
-      <button class="btn" onclick="forcePushFirebase()" style="background:#7c3aed;color:#fff;font-weight:800;flex:1;min-width:120px">📤 Kirim ke Firebase</button>
+      <button class="btn" id="push-btn-main" onclick="forcePushFirebase()" style="background:#7c3aed;color:#fff;font-weight:800;flex:1;min-width:120px">📤 Kirim ke Firebase</button>
     </div>
+    <div id="push-status-main" style="display:none;margin-top:10px;padding:12px 14px;border-radius:10px;font-size:.82rem;font-weight:700;line-height:1.6;word-break:break-all"></div>
     <div style="font-size:.74rem;color:#4f46e5;margin-top:10px;line-height:1.6;background:#e0e7ff;border-radius:8px;padding:8px 10px">
       ⚠️ <b>Jika Firebase lebih sedikit dari Device ini:</b> di HP klik <b>📤 Kirim ke Firebase</b> dulu, baru di laptop klik <b>📥 Ambil dari Firebase</b>.
     </div>
