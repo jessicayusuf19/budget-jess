@@ -4064,7 +4064,6 @@ function rLapTrend(){
 // TOAST
 // ══════════════════════════
 function showCN(m,dur=2200){
-  // Center notification — class-based untuk iOS Safari reliability
   const el=document.getElementById('cnot');
   if(!el)return;
   clearTimeout(el._tid);
@@ -4073,11 +4072,17 @@ function showCN(m,dur=2200){
   else if(m.startsWith('⚠️'))el.style.background='#d97706';
   else el.style.background='#6366f1';
   el.textContent=m;
-  el.classList.remove('on');
-  void el.offsetWidth; // force reflow — penting untuk iOS Safari
-  el.classList.add('on');
+  // Langsung show — tanpa transisi masuk (paling reliable di iOS Safari)
+  el.style.transition='none';
+  el.style.opacity='1';
+  el.style.transform='translate(-50%,-50%) scale(1)';
   try{if(navigator.vibrate)navigator.vibrate([40,30,40]);}catch(e){}
-  el._tid=setTimeout(()=>el.classList.remove('on'),dur);
+  // Fade out setelah dur ms
+  el._tid=setTimeout(function(){
+    el.style.transition='opacity .3s,transform .3s';
+    el.style.opacity='0';
+    el.style.transform='translate(-50%,-50%) scale(.8)';
+  },dur);
 }
 function showTd(m,dur=3200){
   // Tampilkan center notif untuk semua aksi transaksi (✅/❌)
