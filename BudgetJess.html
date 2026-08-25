@@ -4064,7 +4064,7 @@ function rLapTrend(){
 // TOAST
 // ══════════════════════════
 function showCN(m,dur=2200){
-  // Center notification — muncul di tengah layar untuk setiap aksi transaksi
+  // Center notification — class-based untuk iOS Safari reliability
   const el=document.getElementById('cnot');
   if(!el)return;
   clearTimeout(el._tid);
@@ -4073,20 +4073,15 @@ function showCN(m,dur=2200){
   else if(m.startsWith('⚠️'))el.style.background='#d97706';
   else el.style.background='#6366f1';
   el.textContent=m;
-  el.style.transition='none';el.style.opacity='0';el.style.transform='translate(-50%,-50%) scale(.7)';
-  requestAnimationFrame(()=>{requestAnimationFrame(()=>{
-    el.style.transition='opacity .18s,transform .18s';
-    el.style.opacity='1';el.style.transform='translate(-50%,-50%) scale(1)';
-  });});
+  el.classList.remove('on');
+  void el.offsetWidth; // force reflow — penting untuk iOS Safari
+  el.classList.add('on');
   try{if(navigator.vibrate)navigator.vibrate([40,30,40]);}catch(e){}
-  el._tid=setTimeout(()=>{
-    el.style.transition='opacity .25s,transform .25s';
-    el.style.opacity='0';el.style.transform='translate(-50%,-50%) scale(.7)';
-  },dur);
+  el._tid=setTimeout(()=>el.classList.remove('on'),dur);
 }
 function showTd(m,dur=3200){
   // Tampilkan center notif untuk semua aksi transaksi (✅/❌)
-  if(m.startsWith('✅')||m.startsWith('❌')){setTimeout(()=>showCN(m),200);}
+  if(m.startsWith('✅')||m.startsWith('❌')){setTimeout(()=>showCN(m),400);}
   setTimeout(()=>showT(m,dur),600);
 } // delay 600ms - cukup untuk iOS keyboard dismiss
 function showT(m,dur=3200){
