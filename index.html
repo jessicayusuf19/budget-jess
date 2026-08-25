@@ -4064,24 +4064,23 @@ function rLapTrend(){
 // TOAST
 // ══════════════════════════
 function showCN(m,dur=2200){
-  const el=document.getElementById('cnot');
-  if(!el)return;
-  clearTimeout(el._tid);
-  if(m.startsWith('✅'))el.style.background='#16a34a';
-  else if(m.startsWith('❌'))el.style.background='#dc2626';
-  else if(m.startsWith('⚠️'))el.style.background='#d97706';
-  else el.style.background='#6366f1';
+  // Hapus notif sebelumnya kalau masih ada
+  const old=document.getElementById('cnot-pop');
+  if(old)old.remove();
+  // Buat element BARU setiap kali — tidak ada CSS transition baggage
+  const bg=m.startsWith('✅')?'#16a34a':m.startsWith('❌')?'#dc2626':m.startsWith('⚠️')?'#d97706':'#6366f1';
+  const el=document.createElement('div');
+  el.id='cnot-pop';
   el.textContent=m;
-  // Langsung show — tanpa transisi masuk (paling reliable di iOS Safari)
-  el.style.transition='none';
-  el.style.opacity='1';
-  el.style.transform='translate(-50%,-50%) scale(1)';
+  el.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:'+bg+';color:#fff;padding:22px 36px;border-radius:24px;font-size:1.25rem;font-weight:900;z-index:999999;opacity:1;pointer-events:none;box-shadow:0 24px 64px rgba(0,0,0,.4);max-width:88vw;text-align:center;line-height:1.4;';
+  document.body.appendChild(el);
   try{if(navigator.vibrate)navigator.vibrate([40,30,40]);}catch(e){}
   // Fade out setelah dur ms
-  el._tid=setTimeout(function(){
+  setTimeout(function(){
     el.style.transition='opacity .3s,transform .3s';
     el.style.opacity='0';
     el.style.transform='translate(-50%,-50%) scale(.8)';
+    setTimeout(function(){el.remove();},400);
   },dur);
 }
 function showTd(m,dur=3200){
