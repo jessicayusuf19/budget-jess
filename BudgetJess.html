@@ -13,7 +13,7 @@
 <!-- Auto cache-bust: redirect ke URL baru setiap versi berubah, tanpa user harus clear cache -->
 <script>
 (function(){
-  var VER='20260824.2';
+  var VER='20260824.3';
   if(location.protocol!=='file:'&&location.search.indexOf('v='+VER)===-1){
     location.replace(location.pathname+'?v='+VER+(location.hash||''));
   }
