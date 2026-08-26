@@ -1289,8 +1289,30 @@ const FB_DB='https://budget-jess-default-rtdb.asia-southeast1.firebasedatabase.a
 const FB_KEY='Jessica1994';
 function fbRestUrl(){const cfg=loadFbConfig();return`${FB_DB}/budget/${(cfg&&cfg.syncKey)||FB_KEY}.json`;}
 function localTxCount(){return(st.pTx?st.pTx.length:0)+(st.rtTx?st.rtTx.length:0);}
+
+// Firebase tidak boleh ada key dengan . # $ / [ ] — encode/decode untuk budgets & xi
+function _fbEncKey(k){return k.replace(/\./g,'__D__').replace(/#/g,'__H__').replace(/\$/g,'__S__').replace(/\[/g,'__LB__').replace(/\]/g,'__RB__').replace(/\//g,'__SL__');}
+function _fbDecKey(k){return k.replace(/__D__/g,'.').replace(/__H__/g,'#').replace(/__S__/g,'$').replace(/__LB__/g,'[').replace(/__RB__/g,']').replace(/__SL__/g,'/');}
+function _fbEncObj(obj){if(!obj)return obj;const r={};Object.keys(obj).forEach(k=>{r[_fbEncKey(k)]=obj[k];});return r;}
+function _fbDecObj(obj){if(!obj)return obj;const r={};Object.keys(obj).forEach(k=>{r[_fbDecKey(k)]=obj[k];});return r;}
+function _fbEncode(data){
+  // Encode keys yang mungkin punya karakter terlarang (budgets & xi)
+  const d=JSON.parse(JSON.stringify(data,(k,v)=>{if(v!==v)return 0;if(v===Infinity||v===-Infinity)return 0;return v;}));
+  if(d.budgets)d.budgets=_fbEncObj(d.budgets);
+  if(d.xi)d.xi=_fbEncObj(d.xi);
+  return d;
+}
+function _fbDecode(data){
+  // Decode key balik ke asli setelah pull dari Firebase
+  if(!data)return data;
+  if(data.budgets)data.budgets=_fbDecObj(data.budgets);
+  if(data.xi)data.xi=_fbDecObj(data.xi);
+  return data;
+}
+
 function restPush(){
-  fetch(fbRestUrl(),{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(st)}).catch(()=>{});
+  const payload=_fbEncode(st);
+  fetch(fbRestUrl(),{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)}).catch(()=>{});
 }
 let _skipPollUntil=0;
 function restPoll(){
