@@ -1574,7 +1574,7 @@ function save(){
   const json=JSON.stringify(st);
   localStorage.setItem('jb_v5',json);
   autoBackup(json);
-  if(fbConnected&&fbRef){setSyncStatus('syncing');fbRef.set(st).then(()=>setSyncStatus('connected')).catch(e=>{setSyncStatus('error');restPush();setSyncStatus('connected');});}
+  if(fbConnected&&fbRef){setSyncStatus('syncing');fbRef.set(_fbEncode(st)).then(()=>setSyncStatus('connected')).catch(e=>{setSyncStatus('error');restPush();setSyncStatus('connected');});}
   else{restPush();setSyncStatus('connected');}
   setTimeout(()=>{if(Date.now()>=_skipPollUntil)restPoll();},5500);
 }
