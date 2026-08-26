@@ -1500,7 +1500,7 @@ function forcePushFirebase(){
       fetch(testUrl,{method:'DELETE'}).catch(()=>{});
       // Step 2: Coba SDK dulu (lebih reliable dari REST)
       if(fbConnected&&fbRef){
-        fbRef.set(st)
+        fbRef.set(_fbEncode(st))
           .then(()=>{
             showT('✅ Data berhasil dikirim! ('+localTxCount()+' transaksi)',5000);
             _setPushStatus(true,'✅ Berhasil kirim '+localTxCount()+' transaksi ke Firebase!');
@@ -1515,7 +1515,6 @@ function forcePushFirebase(){
       _forcePushRest();
     })
     .catch(e=>{
-      // Test gagal — tampilkan error detail di banner (bukan alert)
       const msg='❌ GAGAL KIRIM\nError: '+e.message+'\nURL: '+fbRestUrl();
       _setPushStatus(false,msg);
       showT('❌ Gagal: '+e.message.substring(0,50),8000);
@@ -1523,11 +1522,8 @@ function forcePushFirebase(){
 }
 function _forcePushRest(){
   showT('⏳ Mengirim via REST…',8000);
-  const payload=JSON.parse(JSON.stringify(st,(k,v)=>{
-    if(v!==v)return 0;
-    if(v===Infinity||v===-Infinity)return 0;
-    return v;
-  }));
+  // _fbEncode handles NaN/Infinity AND encodes invalid Firebase keys
+  const payload=_fbEncode(st);
   payload._lastModified=Date.now();
   fetch(fbRestUrl(),{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)})
     .then(r=>{
