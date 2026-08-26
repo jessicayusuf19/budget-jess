@@ -1635,7 +1635,7 @@ function forceResync(){
   });
   runMigrations();
   save();
-  if(fbConnected&&fbRef)fbRef.set(st);
+  if(fbConnected&&fbRef)fbRef.set(_fbEncode(st));
   rSavBals();rPD();rRTD();rOV();
   showT('✅ Saldo & transaksi berhasil disinkronkan!');
 }
