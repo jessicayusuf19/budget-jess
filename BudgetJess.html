@@ -1401,6 +1401,7 @@ function initFirebase(cfg){
       const localEmpty=localTotal===0;
       const safeDrop=remoteTotal>=localTotal-50;
       if(localEmpty||remoteTotal>localTotal||(remoteMod>localMod&&safeDrop)){
+        _fbDecode(data);
         st={...DEF,...data};if(!st.xi)st.xi={};if(!st.budgets)st.budgets={};
         runMigrations();localStorage.setItem('jb_v5',JSON.stringify(st));autoBackup();rerenderCurrent();
         showTxNotif('p-notif','🔄 Data diperbarui dari HP!');
